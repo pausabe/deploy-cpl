@@ -1,3 +1,2 @@
-secrets.js
+secrets.env
 .DS_Store
-db

@@ -1,24 +1,31 @@
 const fs = require("fs");
-const express = require('express');
 const basicAuth = require('express-basic-auth');
+const express = require('express');
 const app = express();
+const fileUpload = require('express-fileupload');
+const shell = require('child_process');
+
 const port = 3000;
 
-const user = process.env.CPL_USER;
-const pass = process.env.CPL_PASS;
-
-console.log(user, pass);
+const cpl_user = process.env.CPL_USER;
+const cpl_pass = process.env.CPL_PASS;
+const expo_user = process.env.EXPO_USER;
+const expo_pass = process.env.EXPO_PASS;
+const expo_send = process.env.EXPO_SEND;
+const expo_publish_channel = process.env.EXPO_PUBLISH_CHANNEL;
 
 var webCredentials = {};
-webCredentials[user] = pass;
+webCredentials[cpl_user] = cpl_pass;
 
 app.use(basicAuth({
     challenge: true,
-    users: webCredentials
+    users: webCredentials,
+}),
+fileUpload({
+  createParentPath: true
 }));
 
 app.get('/', (req, res) => {
-    //res.send('Hello World!');
     fs.readFile("index.html", 'utf8', (err, data) => {
         if (err) {
             res.send("Unable to load index.html");
@@ -28,10 +35,31 @@ app.get('/', (req, res) => {
     });
 })
 
-app.post('/upload', (req, res) => {
-    console.log("Fchero subido!!");
-    console.log(req.files);
-    res.send("Hemos recibido tu ficheroooo!!");
+app.post('/upload', async (req, res) => {
+  try {
+    if(!req.files) {
+      res.send('No file uploaded');
+    } 
+    else {
+
+      // Retreive database file
+      let db_file = req.files.db_file;
+      
+      // Use the mv() method to place the file in upload directory
+      db_file.mv('./cpl-app/src/Assets/db/cpl-app.db');
+
+      // Run deploy script
+      shell.exec(
+        `sh deploy-cpl.sh ${expo_user} ${expo_pass} ${expo_send} ${expo_publish_channel}`, 
+        async (err, stdout, stderr) => {
+          res.send('App deploy correct');
+        });
+
+    }
+  } 
+  catch (err) {
+    res.status(500).send(err);
+  }
 });
 
 app.listen(port, () => {
