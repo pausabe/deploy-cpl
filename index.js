@@ -33,12 +33,24 @@ app.get('/', (req, res) => {
         }
         res.send(data);
     });
-})
+});
+
+app.get('/download', function(req, res){
+  try {
+
+    res.download(
+      __dirname + '/cpl-app/src/Assets/db/cpl-app.db', 
+      (error) => res.send('Actualment no hi ha cap base de dades actualment'));
+
+  } catch (error) {
+    res.send('Something went wrong: ' + error);
+  }
+});
 
 app.post('/upload', async (req, res) => {
   try {
     if(!req.files) {
-      res.send('No file uploaded');
+      res.send('Error: cap base de dades introduïda');
     } 
     else {
 
@@ -52,7 +64,7 @@ app.post('/upload', async (req, res) => {
       shell.exec(
         `sh deploy-cpl.sh ${expo_user} ${expo_pass} ${expo_send} ${expo_publish_channel}`, 
         async (err, stdout, stderr) => {
-          res.send('App deploy correct');
+          res.send('Publicació realitzada correctament');
         });
 
     }

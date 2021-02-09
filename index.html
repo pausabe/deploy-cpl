@@ -6,9 +6,13 @@
     </head>
     <body>
         <form action="/upload" method="POST" enctype="multipart/form-data">
-            <label>Selecciona un fitxer de base de dades: </label>
+            <label>Selecciona la base de dades: </label>
             <input name="db_file" type="file" accept=".db" />
-            <button type="submit">Acceptar</button>
+            <button type="submit">Pujar</button>
+        </form>
+        <form action="/download" method="GET">
+            <label>Descarrega l'última base de dades en el servidor: </label>
+            <button type="submit">Baixar</button>
         </form>
     </body>
 </html>

@@ -18,6 +18,7 @@ WORKDIR /opt/deploy-cpl
 COPY deploy-cpl.sh .
 COPY index.js .
 COPY index.html .
+COPY /db/cpl-app.db ./cpl-app/src/Assets/db/
 
 EXPOSE 3000
 
