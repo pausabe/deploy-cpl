@@ -39,8 +39,7 @@ app.get('/download', function(req, res){
   try {
 
     res.download(
-      __dirname + '/cpl-app/src/Assets/db/cpl-app.db', 
-      (error) => res.send('Actualment no hi ha cap base de dades actualment'));
+      __dirname + '/cpl-app/src/Assets/db/cpl-app.db');
 
   } catch (error) {
     res.send('Something went wrong: ' + error);
