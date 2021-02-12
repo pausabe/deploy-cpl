@@ -13,6 +13,7 @@ RUN git clone https://github.com/pausabe/cpl-app cpl-app\
 
 WORKDIR /opt/deploy-cpl/cpl-app
 RUN npm install
+RUN expo install react-native-safe-area-context
 WORKDIR /opt/deploy-cpl
 
 COPY deploy-cpl.sh .
