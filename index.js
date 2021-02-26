@@ -63,6 +63,8 @@ app.post('/upload', async (req, res) => {
       // Use the mv() method to place the file in upload directory
       db_file.mv('./cpl-app/src/Assets/db/cpl-app.db');
 
+      console.log(`channel: ${expo_prod_channel}`)
+
       // Run deploy script
       shell.exec(
         `sh deploy-cpl.sh ${expo_user} ${expo_pass} ${expo_send} ${expo_prod_channel}`, 
@@ -93,6 +95,8 @@ app.post('/uploadTest', async (req, res) => {
       
       // Use the mv() method to place the file in upload directory
       db_file.mv('./cpl-app/src/Assets/db/cpl-app.db');
+
+      console.log(`channel: ${expo_test_channel}`)
 
       // Run deploy script
       shell.exec(

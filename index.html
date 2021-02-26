@@ -7,19 +7,19 @@
     <body>
         <form action="/upload" method="POST" enctype="multipart/form-data">
             <label>Selecciona la base de dades: </label>
-            <input name="db_file" type="file" accept=".db" /><br>
+            <input name="db_file" type="file" accept=".db" />
             <button type="submit">Pujar</button>
         </form>
         <form action="/download" method="GET">
             <label>Descarrega l'última base de dades en el servidor: </label>
             <button type="submit">Baixar</button>
         </form>
-        <label>---------------------------------------------------------<label>
+        <br><br><br>
+        <label>----------------------------------------------------------TESTS [només Pau]----------------------------------------------------------<label>
         <form action="/uploadTest" method="POST" enctype="multipart/form-data">
-            <label>[[[[ TESTS [només Pau]: Database: </label>
+            <label>TESTS [només Pau]: Database: </label>
             <input name="db_file" type="file" accept=".db" />
             <button type="submit">Upload</button>
-            <label> ]]]]</label>
         </form>
     </body>
 </html>

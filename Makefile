@@ -6,7 +6,7 @@ clean:
 	docker stop deploy-cpl
 	docker rm deploy-cpl
 run:
-	docker run -d --name=deploy-cpl -p 3000:3000 --env-file secrets.env deploy-cpl -v /mnt/usb:/opt/usb
+	docker run -d --name=deploy-cpl -p 3000:3000 --env-file secrets.env deploy-cpl --privileged -v  /mnt/usb:/opt/usb ubuntu bash
 run-single:
 	docker run --rm deploy-cpl
 run-terminal:
