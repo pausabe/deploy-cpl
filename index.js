@@ -12,7 +12,8 @@ const cpl_pass = process.env.CPL_PASS;
 const expo_user = process.env.EXPO_USER;
 const expo_pass = process.env.EXPO_PASS;
 const expo_send = process.env.EXPO_SEND;
-const expo_publish_channel = process.env.EXPO_PUBLISH_CHANNEL;
+const expo_test_channel = process.env.EXPO_TEST_CHANNEL;
+const expo_prod_channel = process.env.EXPO_PROD_CHANNEL;
 
 var webCredentials = {};
 webCredentials[cpl_user] = cpl_pass;
@@ -62,9 +63,16 @@ app.post('/upload', async (req, res) => {
       // Use the mv() method to place the file in upload directory
       db_file.mv('./cpl-app/src/Assets/db/cpl-app.db');
 
+      // Determine channel to publish
+      var publish_channel = expo_prod_channel;
+      if(req.files.IsTestCheckbox.checked)
+        publish_channel = expo_test_channel;
+
+      console.log(`publish_channel ${publish_channel}`);
+
       // Run deploy script
       shell.exec(
-        `sh deploy-cpl.sh ${expo_user} ${expo_pass} ${expo_send} ${expo_publish_channel}`, 
+        `sh deploy-cpl.sh ${expo_user} ${expo_pass} ${expo_send} ${publish_channel}`, 
         async (err, stdout, stderr) => {
           console.log("upload: Publicació realitzada correctament");
           res.send('Publicació realitzada correctament');

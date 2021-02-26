@@ -7,7 +7,9 @@
     <body>
         <form action="/upload" method="POST" enctype="multipart/form-data">
             <label>Selecciona la base de dades: </label>
-            <input name="db_file" type="file" accept=".db" />
+            <input name="db_file" type="file" accept=".db" /><br>
+            <input name="IsTestCheckbox" type="checkbox" checked="false" />
+            <label for="IsTestCheckbox"> Test (només Pau)</label><br>
             <button type="submit">Pujar</button>
         </form>
         <form action="/download" method="GET">
