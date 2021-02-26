@@ -21,6 +21,8 @@ COPY index.js .
 COPY index.html .
 COPY /db/cpl-app.db ./cpl-app/src/Assets/db/
 
+RUN mkdir /opt/usb
+
 EXPOSE 3000
 
 CMD ["node", "index.js"]
