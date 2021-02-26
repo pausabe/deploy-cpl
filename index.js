@@ -63,16 +63,40 @@ app.post('/upload', async (req, res) => {
       // Use the mv() method to place the file in upload directory
       db_file.mv('./cpl-app/src/Assets/db/cpl-app.db');
 
-      // Determine channel to publish
-      var publish_channel = expo_prod_channel;
-      if(req.files.IsTestCheckbox.checked)
-        publish_channel = expo_test_channel;
+      // Run deploy script
+      shell.exec(
+        `sh deploy-cpl.sh ${expo_user} ${expo_pass} ${expo_send} ${expo_prod_channel}`, 
+        async (err, stdout, stderr) => {
+          console.log("upload: Publicació realitzada correctament");
+          res.send('Publicació realitzada correctament');
+        });
 
-      console.log(`publish_channel ${publish_channel}`);
+    }
+  } 
+  catch (err) {
+    console.log("upload error", err);
+    res.status(500).send(err);
+  }
+});
+
+app.post('/uploadTest', async (req, res) => {
+  try {
+    console.log("upload-test");
+    if(!req.files) {
+      console.log("upload: cap base de dades introduïda");
+      res.send('Error: cap base de dades introduïda');
+    } 
+    else {
+
+      // Retreive database file
+      let db_file = req.files.db_file;
+      
+      // Use the mv() method to place the file in upload directory
+      db_file.mv('./cpl-app/src/Assets/db/cpl-app.db');
 
       // Run deploy script
       shell.exec(
-        `sh deploy-cpl.sh ${expo_user} ${expo_pass} ${expo_send} ${publish_channel}`, 
+        `sh deploy-cpl.sh ${expo_user} ${expo_pass} ${expo_send} ${expo_test_channel}`, 
         async (err, stdout, stderr) => {
           console.log("upload: Publicació realitzada correctament");
           res.send('Publicació realitzada correctament');
