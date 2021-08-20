@@ -102,8 +102,16 @@ app.post('/uploadTest', async (req, res) => {
       shell.exec(
         `sh deploy-cpl.sh ${expo_user} ${expo_pass} ${expo_send} ${expo_test_channel}`, 
         async (err, stdout, stderr) => {
-          console.log("upload: Publicació realitzada correctament");
-          res.send('Publicació realitzada correctament');
+          if(err == null){
+            console.log("upload: Publicació realitzada correctament");
+            res.send('Publicació realitzada correctament');
+          }
+          else{
+            console.log("script execution error:", err);
+            console.log("stdout:", stdout);
+            console.log("stderr:", stderr);
+            res.status(500).send(err);
+          }
         });
 
     }
