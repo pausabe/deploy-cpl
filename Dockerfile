@@ -7,6 +7,7 @@ RUN npm install --quiet -g expo-cli@4.9.1
 RUN npm install --quiet --save express
 RUN npm install --quiet --save express-basic-auth
 RUN npm install --quiet --save express-fileupload
+RUN npm install sqlite3 --build-from-source
 RUN git clone https://github.com/pausabe/cpl-app cpl-app\
     && cd cpl-app\
     && git checkout master\
@@ -22,6 +23,7 @@ COPY index.js .
 COPY index.html .
 COPY /db/cpl-app.db ./cpl-app/src/Assets/db/
 
+RUN mkdir /opt/deploy-cpl/database
 RUN mkdir /opt/usb
 
 EXPOSE 3000

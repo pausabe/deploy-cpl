@@ -15,11 +15,19 @@
             <button type="submit">Baixar</button>
         </form>
         <br><br><br>
+        <label>App Version: </label>
+        <label id="app_version"></label>
+        <br><br><br>
         <label>----------------------------------------------------------TESTS (només Pau)----------------------------------------------------------<label>
         <form action="/uploadTest" method="POST" enctype="multipart/form-data">
             <label>Database: </label>
             <input name="db_file" type="file" accept=".db" />
             <button type="submit">Publish</button>
+        </form>
+        <form action="/getScript" method="POST" enctype="multipart/form-data">
+            <label>Database Version: </label>
+            <input name="databaseVersion" type="number" />
+            <button type="submit">Get Script Json</button>
         </form>
     </body>
 </html>

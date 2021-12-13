@@ -1,5 +1,4 @@
 #!/bin/sh
-cp cpl-app/src/Assets/db/cpl-app.db /opt/usb/$4_$(date +%m-%d-%y)_cpl-app.db
 cd cpl-app
 git pull
 npm install
