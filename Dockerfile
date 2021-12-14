@@ -20,6 +20,8 @@ WORKDIR /opt/deploy-cpl
 
 COPY deploy-cpl.sh .
 COPY index.js .
+COPY Services/ ./Services
+COPY Utils/ ./Utils
 COPY index.html .
 COPY /db/cpl-app.db ./cpl-app/src/Assets/db/
 
