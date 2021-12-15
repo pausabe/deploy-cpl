@@ -24,8 +24,10 @@ COPY Services/ ./Services
 COPY Utils/ ./Utils
 COPY index.html .
 COPY /db/cpl-app.db ./cpl-app/src/Assets/db/
+COPY UpdateAppRepository.sh .
 
 RUN mkdir /opt/deploy-cpl/database
+RUN mkdir /opt/deploy-cpl/databaseTest
 RUN mkdir /opt/usb
 
 EXPOSE 3000

@@ -13,8 +13,9 @@ async function GenerateJsonScript(minTablesLogId){
                 GROUP BY table_name, row_id, action\
                 ORDER BY id ASC';
     let rows = await DatabaseService.ExecQuery(sql);
+    console.log("Changes Row Count: " + rows.length);
     await AsyncForEach.AsyncForEach(rows, async (row) => {
-        console.log("script for " + row["table_name"] + " - " + row["row_id"] + "(" + row["action"] + ")");
+        //console.log("script for " + row["table_name"] + " - " + row["row_id"] + "(" + row["action"] + ")");
         let repeated_records = row["repeated_records"];
         if(repeated_records == 1){
         let rowScriptJson = await jsonScriptFromRow(row, true);

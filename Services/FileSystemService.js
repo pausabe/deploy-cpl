@@ -19,10 +19,29 @@ async function MoveFile(oldFilePath, newFilePath){
     });
 }
 
+async function CopyFile(originPath, destinationPath){
+    return new Promise((resolve, reject) => {
+        try {
+            if(fs.existsSync(originPath)){
+                console.log("Copying file from " + originPath + " to " + destinationPath);
+                fs.copyFile(originPath, destinationPath, () => resolve());
+            }
+            else{
+                console.log("No file to move");
+                resolve();
+            }
+        } 
+        catch (error) {
+            console.log("Error moving the file:", error);
+            resolve();
+        }
+    });
+}
+
 async function WriteStringInFile(path, content){
     return new Promise((resolve, reject) => {
         fs.writeFile(path, content, () => resolve());
     });
 }
 
-module.exports = { MoveFile,  WriteStringInFile};
+module.exports = { MoveFile,  WriteStringInFile, CopyFile};
