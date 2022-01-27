@@ -16,10 +16,8 @@ const cpl_pass = process.env.CPL_PASS;
 const expo_user = process.env.EXPO_USER;
 const expo_pass = process.env.EXPO_PASS;
 const expo_send = process.env.EXPO_SEND;
-const expo_test_channel = process.env.EXPO_TEST_CHANNEL;
 const expo_prod_channel = process.env.EXPO_PROD_CHANNEL;
 const app_repo_branch_production = process.env.APP_REPO_BRANCH_PRODUCTION;
-const app_repo_branch_test = process.env.APP_REPO_BRANCH_TEST;
 
 var webCredentials = {};
 webCredentials[cpl_user] = cpl_pass;
@@ -79,9 +77,17 @@ app.post('/uploadTest', async (req, res) => {
       console.log("upload: cap base de dades introduïda");
       res.send('Error: cap base de dades introduïda');
     } 
-    else {
+    else if(!req.body.repobranch) {
+      console.log("upload: cap repo introduït");
+      res.send('Error: cap repo introduït');
+    }
+    else if(!req.body.releasechannel) {
+      console.log("upload: cap channel introduït");
+      res.send('Error: cap channel introduït');
+    }
+    else{
       DatabaseKeys.DatabaseDirectory = DatabaseKeys.DatabaseDirectoryTest;
-      await PublishDatabaseChangesTest(req.files.db_file);
+      await PublishDatabaseChangesTest(req.files.db_file, req.body.repobranch, req.body.releasechannel);
       console.log("upload: Publicació realitzada correctament");
       res.send('Publicació realitzada correctament');
     }
@@ -128,19 +134,19 @@ app.listen(port, () => {
 })
 
 async function PublishDatabaseChangesProduction(uploadedDatabase){
-  PublishDatabaseChanges(
+  await PublishDatabaseChanges(
     uploadedDatabase,
     true,
     app_repo_branch_production,
     expo_prod_channel);
 }
 
-async function PublishDatabaseChangesTest(uploadedDatabase){
-  PublishDatabaseChanges(
-    uploadedDatabase,
-    false,
-    app_repo_branch_test,
-    expo_test_channel);
+async function PublishDatabaseChangesTest(uploadedDatabase, repoBranch, otaChannel){
+  await PublishDatabaseChanges(
+      uploadedDatabase,
+      false,
+      repoBranch,
+      otaChannel);
 }
 
 async function PublishDatabaseChanges(

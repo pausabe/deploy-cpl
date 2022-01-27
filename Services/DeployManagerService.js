@@ -47,8 +47,8 @@ async function DeployAppProject(expoReleaseChannel, expo_user, expo_pass, expo_s
         let currentAppVersion = GetCurrentAppVersion();
         let channelName = expoReleaseChannel + "_" + currentAppVersion;
         console.log("Deploying App in channel: " + channelName);
-        console.log("DatabaseKeys.AvoidDeploy", DatabaseKeys.AvoidDeploy);
-        if(DatabaseKeys.AvoidDeploy){
+        console.log("DatabaseKeys.AvoidDeploy", DatabaseKeys.DeployActivated);
+        if(DatabaseKeys.DeployActivated){
             resolve();
         }
         else{

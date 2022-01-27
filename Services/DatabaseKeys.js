@@ -4,6 +4,6 @@ module.exports = {
     DatabaseBackupDirectory: './opt/usb/',
     DatabaseName: 'cpl-app.db',
     ScriptsPath: "./cpl-app/src/Assets/DatabaseUpdateScript/UpdateScript.json",
-    AvoidDeploy: true, // TODO: set false
+    DeployActivated: false, // TODO: set true when all ok
     AppProjectDatabasePath: "./cpl-app/src/Assets/"
 }

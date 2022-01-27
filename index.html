@@ -1,33 +1,124 @@
 <!DOCTYPE>
 <html>
     <head>
-        <meta charset="UTF-8" />
-        <title>CPL Deploy</title>
+        <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body {font-family: Arial;}
+
+            /* Style the tab */
+            .tab {
+                overflow: hidden;
+                border: 1px solid #ccc;
+                background-color: #f1f1f1;
+            }
+
+            /* Style the buttons inside the tab */
+            .tab button {
+                background-color: inherit;
+                float: left;
+                border: none;
+                outline: none;
+                cursor: pointer;
+                padding: 14px 16px;
+                transition: 0.3s;
+                font-size: 17px;
+            }
+
+            .tab button:hover {
+                background-color: #ddd;
+            }
+
+            .tab button.active {
+                background-color: #ccc;
+            }
+
+            .tabcontent {
+                display: none;
+                padding: 6px 12px;
+                border: 1px solid #ccc;
+                border-top: none;
+            }
+        </style>
     </head>
     <body>
-        <form action="/upload" method="POST" enctype="multipart/form-data">
-            <label>Selecciona la base de dades: </label>
-            <input name="db_file" type="file" accept=".db" />
-            <button type="submit">Pujar</button>
-        </form>
-        <form action="/download" method="GET">
-            <label>Descarrega l'última base de dades en el servidor: </label>
-            <button type="submit">Baixar</button>
-        </form>
-        <br><br><br>
-        <label>----------------------------------------------------------(només Pau)----------------------------------------------------------<label>
-        <form action="/UpdateDatabase" method="POST" enctype="multipart/form-data">
-            <button type="submit">Update Database</button>
-        </form>
-        <form action="/uploadTest" method="POST" enctype="multipart/form-data">
-            <label>Database: </label>
-            <input name="db_file" type="file" accept=".db" />
-            <button type="submit">Publish</button>
-        </form>
-        <form action="/getScript" method="POST" enctype="multipart/form-data">
-            <label>Database Version: </label>
-            <input name="databaseVersion" type="number" />
-            <button type="submit">Get Script Json</button>
-        </form>
+
+        <h2>CPL Distribució App</h2>
+        <p>Selecciona el teu perfil:</p>
+
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'Editorial')">CPL Editorial</button>
+            <button class="tablinks" onclick="openTab(event, 'Administrador')">Administrador</button>
+        </div>
+
+        <div id="Editorial" class="tabcontent">
+            <label>1. Descarrega la base de dades</label><br>
+            <label>2. Fes les modificacions pertinents</label><br>
+            <label>3. Puja la base de dades</label><br><br>
+            <form action="/download" method="GET">
+                <label>Descarrega l'última base de dades en el servidor: </label>
+                <button type="submit">Baixar</button>
+            </form>
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <label>Selecciona la base de dades: </label>
+                <input name="db_file" type="file" accept=".db" />
+                <button type="submit">Pujar</button>
+            </form>
+        </div>
+
+        <div id="Administrador" class="tabcontent">
+            <form action="/UpdateDatabase" method="POST" enctype="multipart/form-data">
+                <h4>Update Repository Database</h4>
+                <p>When we want to update the App using stores we need to download the latest database from CPL Editorial tab to create the builds.</p>
+                <p>In order to have the local repository of the web updated, with the same latest database, we need to update it.</p>
+                <p>Every deploy from the web we save the database and using the follow action we can update the database project with the latest uploaded.</p>
+                <p>Its very important to do it every time we update the App using the stores, otherwise the deploy would send an incorrect (and older) database to all devices</p>
+                <button type="submit"
+                        onclick="return confirm('Are you sure?');">Update</button>
+            </form>
+            <hr>
+            <form action="/getScript" method="POST" enctype="multipart/form-data">
+                <h4>Updates Script</h4>
+                <p>Obtain the updates script preview from the current uploaded database in CPL Editorial tab (production). Just for testing purposes</p>
+                <label>Update Id to start (0 to obtain all the changes): </label>
+                <input name="databaseVersion" type="number" />
+                <button type="submit">Get Script</button>
+            </form>
+            <hr>
+            <form action="/uploadTest" method="POST" enctype="multipart/form-data">
+                <h4>Release Update</h4>
+                <p>Release the script updates from the uploaded database to the desired channel using Expo OTA. Make sure it's a test channel!</p>
+                <label>It will:</label><br>
+                <label>1. Save the database in the database test directory</label><br>
+                <label>TODO: wouldnt be the repository database deprecated? pero clar.. tmpoc machacaria la base de dades, qina por. pq en def. es el projecte mateix qe en test. De fet qina por aixo ultim. I si estic fent una prova i faig pull de Test i en aqell moment CPL envia una publicacio? mama mia.... hauré de seperar-ho en 2 projectes no? llavors ja no hi haura problema i guess</label>
+                <label>2. Update repository with the introduced repo branch name</label><br>
+                <label>3. Generate the updates script from the uploaded database</label><br>
+                <label>4. Deploy to the introduced channel</label><br><br>
+                <label>> Repository Branch: </label>
+                <input name="repobranch" type="text" /><br><br>
+                <label>> Release Channel Name: </label>
+                <input name="releasechannel" type="text" /><br><br>
+                <label>> Database: </label>
+                <input name="db_file" type="file" accept=".db" />
+                <button type="submit"
+                        onclick="return confirm('Are you sure?');">Publish</button>
+            </form>
+        </div>
+
+        <script>
+            function openTab(evt, cityName) {
+                var i, tabcontent, tablinks;
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                document.getElementById(cityName).style.display = "block";
+                evt.currentTarget.className += " active";
+            }
+        </script>
+
     </body>
 </html>
