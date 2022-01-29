@@ -2,17 +2,18 @@
 const DatabaseKeys = require("./DatabaseKeys");
 const sqlite3 = require('sqlite3').verbose();
 
-var CPLDataBase = undefined;
+let CPLDataBase = undefined;
 
-function OpenDatabase(){
-    if(CPLDataBase == undefined){
-        console.log("Opening database: " + DatabaseKeys.DatabaseDirectory + DatabaseKeys.DatabaseName);
-        CPLDataBase = new sqlite3.Database(DatabaseKeys.DatabaseDirectory + DatabaseKeys.DatabaseName);
+function OpenDatabase(scriptsDatabaseDirectory){
+    if(CPLDataBase === undefined){
+        const scriptsDatabasePath = `./${scriptsDatabaseDirectory}/${DatabaseKeys.DatabaseName}`;
+        console.log("Opening database: " + scriptsDatabasePath);
+        CPLDataBase = new sqlite3.Database(scriptsDatabasePath);
     }
 }
 
 function CloseDatabase(){
-    if(CPLDataBase != undefined){
+    if(CPLDataBase !== undefined){
         CPLDataBase.close();
         CPLDataBase = undefined;
     }
@@ -20,7 +21,7 @@ function CloseDatabase(){
 
 function ExecQuery(query){
     return new Promise((resolve,reject) => {
-        if(CPLDataBase == undefined){
+        if(CPLDataBase === undefined){
             reject("Call OpenDatabase() first")
         }
         else{
@@ -34,4 +35,4 @@ function ExecQuery(query){
     });
 }
 
-module.exports = { OpenDatabase, CloseDatabase, ExecQuery };
+module.exports = { OpenDatabase, CloseDatabase, ExecQuery }

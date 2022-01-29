@@ -2,9 +2,9 @@ const FileSystemService = require("./FileSystemService")
 const DatabaseKeys = require("./DatabaseKeys");
 
 async function UpdateDatabase(){
-    FileSystemService.CopyFile(
-        DatabaseKeys.DatabaseDirectory + DatabaseKeys.DatabaseName,
-        DatabaseKeys.AppProjectDatabasePath + DatabaseKeys.DatabaseName);
+    await FileSystemService.CopyFile(
+        `./${DatabaseKeys.ScriptsDatabaseDirectoryName}/${DatabaseKeys.DatabaseName}`,
+        `./${DatabaseKeys.RepositoryDirectoryName}${DatabaseKeys.AppProjectDatabasePath}${DatabaseKeys.DatabaseName}`);
 }
 
-module.exports = { UpdateDatabase };
+module.exports = { UpdateDatabase }

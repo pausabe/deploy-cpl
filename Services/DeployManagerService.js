@@ -5,25 +5,26 @@ const DatabaseKeys = require("./DatabaseKeys");
 const shell = require('child_process');
 const fs = require("fs");
 
-async function BackUpCurrentDatabase(){
+async function BackUpLastSavedDatabase(){
     let today = new Date();
     let backupName = today.getMonth().toString() + today.getDay().toString() + today.getFullYear().toString() + "_" + DatabaseKeys.DatabaseName;
-    let oldFilePath = DatabaseKeys.DatabaseDirectory + DatabaseKeys.DatabaseName
-    let newFilePath = DatabaseKeys.DatabaseBackupDirectory + backupName;
+    let oldFilePath = `./${DatabaseKeys.ScriptsDatabaseDirectoryName}/${DatabaseKeys.DatabaseName}`;
+    let newFilePath = DatabaseKeys.ScriptsDatabaseBackupDirectory + backupName;
     console.log("Back up: " + oldFilePath + " -> " + newFilePath);
     await FileSystemService.MoveFile(oldFilePath, newFilePath);
 }
 
-async function SaveUploadedDatabase(db_file){
-    let databaseFilePath = DatabaseKeys.DatabaseDirectory + DatabaseKeys.DatabaseName;
+async function SaveUploadedDatabase(db_file, scriptFileDatabaseDirectory){
+    let databaseFilePath = `./${scriptFileDatabaseDirectory}/${DatabaseKeys.DatabaseName}`;
     console.log("Saving Uploaded Database into: " + databaseFilePath);
     await db_file.mv(databaseFilePath);
 }
 
-async function GenerateChangesScriptIntoAppProject(){
-    console.log("Generating changes script into: " + DatabaseKeys.ScriptsPath);
-    let jsonScript = await ScriptGeneratorService.GenerateJsonScript(0);
-    await FileSystemService.WriteStringInFile(DatabaseKeys.ScriptsPath, JSON.stringify(jsonScript));
+async function GenerateChangesScriptFileIntoAppProject(repositoryDirectoryName, scriptsDatabaseDirectory){
+    const scriptFilePath = `./${repositoryDirectoryName}${DatabaseKeys.ScriptsPath}`;
+    console.log("Generating changes script into: " + scriptFilePath);
+    let jsonScript = await ScriptGeneratorService.GenerateJsonScript(0, scriptsDatabaseDirectory);
+    await FileSystemService.WriteStringInFile(scriptFilePath, JSON.stringify(jsonScript));
 }
 
 async function UpdateAppRepository(appRepoBranch){
@@ -33,25 +34,22 @@ async function UpdateAppRepository(appRepoBranch){
         `sh UpdateAppRepository.sh ${appRepoBranch}`, 
         async (err, stdout, stderr) => {
             if(err){
-            reject();
+                reject();
             }
             else{
-            resolve();
+                resolve();
             }
         });
     });
 }
 
-async function DeployAppProject(expoReleaseChannel, expo_user, expo_pass, expo_send){
+async function DeployAppProject(expoReleaseChannel, repositoryDirectoryName, expo_user, expo_pass, expo_send){
     return new Promise((resolve, reject) => {
-        let currentAppVersion = GetCurrentAppVersion();
+        let currentAppVersion = GetCurrentAppVersion(repositoryDirectoryName);
         let channelName = expoReleaseChannel + "_" + currentAppVersion;
         console.log("Deploying App in channel: " + channelName);
         console.log("DatabaseKeys.AvoidDeploy", DatabaseKeys.DeployActivated);
-        if(DatabaseKeys.DeployActivated){
-            resolve();
-        }
-        else{
+        if(DatabaseKeys.DeployActivated && expoReleaseChannel !== "prod_channel"){ // TODO: remove prod_channel check
             shell.exec(
                 `sh deploy-cpl.sh ${expo_user} ${expo_pass} ${expo_send} ${channelName}`, 
                 async (err, stdout, stderr) => {
@@ -62,18 +60,21 @@ async function DeployAppProject(expoReleaseChannel, expo_user, expo_pass, expo_s
                         resolve();
                     }
                 });
+            resolve();
+        }
+        else{
+            resolve();
         }
     });
 }
 
-function GetCurrentAppVersion(){
-    let appConfigFilePath = "./cpl-app/app.json";
+function GetCurrentAppVersion(repositoryDirectoryName){
+    let appConfigFilePath = `./${repositoryDirectoryName}/app.json`;
     let appConfigFileContentString = fs.readFileSync(appConfigFilePath);
     let appConfigFileContentJson = JSON.parse(appConfigFileContentString);
     let appVersionRaw = appConfigFileContentJson.expo.version;
     let appVersionRawArray = appVersionRaw.split(".");
-    let appVersion = appVersionRawArray[0] + "." + appVersionRawArray[1];
-    return appVersion;
+    return appVersionRawArray[0] + "." + appVersionRawArray[1];
 }
 
-module.exports = { BackUpCurrentDatabase,  SaveUploadedDatabase, GenerateChangesScriptIntoAppProject, UpdateAppRepository, DeployAppProject };
+module.exports = { BackUpLastSavedDatabase, SaveUploadedDatabase, GenerateChangesScriptFileIntoAppProject, UpdateAppRepository, DeployAppProject }

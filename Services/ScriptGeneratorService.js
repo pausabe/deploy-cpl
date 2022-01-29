@@ -1,12 +1,12 @@
-const AsyncForEach = require("../Utils/AsyncForEach");
 const DatabaseService = require("./DatabaseService");
+const AsyncForEach = require("../Utils/AsyncForEach");
 
-async function GenerateJsonScript(minTablesLogId){
+async function GenerateJsonScript(minTablesLogId, scriptsDatabaseDirectory){
     console.log("generating json scripts");
     let scriptJson = [];
     
     // Get list of changes
-    DatabaseService.OpenDatabase();
+    DatabaseService.OpenDatabase(scriptsDatabaseDirectory);
     let sql = 'SELECT MAX(id) As id, table_name, row_id, action, COUNT(id) AS repeated_records\
                 FROM _tables_log\
                 WHERE id > ' + minTablesLogId + '\
@@ -17,7 +17,7 @@ async function GenerateJsonScript(minTablesLogId){
     await AsyncForEach.AsyncForEach(rows, async (row) => {
         //console.log("script for " + row["table_name"] + " - " + row["row_id"] + "(" + row["action"] + ")");
         let repeated_records = row["repeated_records"];
-        if(repeated_records == 1){
+        if(repeated_records === 1){
         let rowScriptJson = await jsonScriptFromRow(row, true);
         scriptJson.push(rowScriptJson);
         }
@@ -57,8 +57,7 @@ async function jsonScriptFromRow(row, addValues){
     }
     */
     let rowColumnNames = Object.keys(row);
-    let scriptJsonRow = await getScriptJsonRow(rowColumnNames, row, addValues);
-    return scriptJsonRow;
+    return await getScriptJsonRow(rowColumnNames, row, addValues);
 }
 
 async function getScriptJsonRow(rowColumnNames, row, addValues){
@@ -72,7 +71,7 @@ async function getScriptJsonRow(rowColumnNames, row, addValues){
       scriptJsonRow[rowColumnName] = rowValue;
   
       // When Inserting (1) or Updating (2) we need to add the values
-      if (addValues && rowColumnName == 'action' && (rowValue == 1 || rowValue == 2)){
+      if (addValues && rowColumnName === 'action' && (rowValue === 1 || rowValue === 2)){
         let table_name = row["table_name"];
         let row_id = row["row_id"];
         scriptJsonRow["values"] = await getScriptJsonRowValues(table_name, row_id);
@@ -83,16 +82,16 @@ async function getScriptJsonRow(rowColumnNames, row, addValues){
   
 async function getScriptJsonRowValues(table_name, row_id){
     let scriptJsonRowValues = {};
-    if(row_id != ""){
+    if(row_id !== ""){
         let sql = "SELECT * FROM " + table_name + " WHERE id = " + row_id;
         let queryRowsResult = await DatabaseService.ExecQuery(sql);
-        if (queryRowsResult.length == 1) {
+        if (queryRowsResult.length === 1) {
             let columns = Object.keys(queryRowsResult[0]);
             let values = Object.values(queryRowsResult[0]);
             for (let index = 0; index < values.length; index++) {
                 let column = columns[index];
                 let value = values[index];
-                if(column != "id"){
+                if(column !== "id"){
                     //if(value.length > 10) value = value.substring(0,10); // just for testing
                     scriptJsonRowValues[column] = value;
                 }
@@ -102,4 +101,4 @@ async function getScriptJsonRowValues(table_name, row_id){
     return scriptJsonRowValues;
 }
 
-module.exports = { GenerateJsonScript };
+module.exports = { GenerateJsonScript }

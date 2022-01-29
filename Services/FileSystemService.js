@@ -27,8 +27,7 @@ async function CopyFile(originPath, destinationPath){
                 fs.copyFile(originPath, destinationPath, () => resolve());
             }
             else{
-                console.log("No file to move");
-                resolve();
+                reject("Origin file path doesn't exist");
             }
         } 
         catch (error) {

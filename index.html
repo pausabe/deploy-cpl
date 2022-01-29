@@ -43,62 +43,70 @@
     <body>
 
         <h2>CPL Distribució App</h2>
-        <p>Selecciona el teu perfil:</p>
+        <p>Selecciona el teu perfil (CPL Editorial o Admin):</p>
 
         <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'Editorial')">CPL Editorial</button>
-            <button class="tablinks" onclick="openTab(event, 'Administrador')">Administrador</button>
+            <button class="tablinks" onclick="openTab(event, 'CPL')">CPL Editorial</button>
+            <button class="tablinks" onclick="openTab(event, 'Admin')">Admin</button>
         </div>
 
-        <div id="Editorial" class="tabcontent">
+        <div id="CPL" class="tabcontent">
             <label>1. Descarrega la base de dades</label><br>
             <label>2. Fes les modificacions pertinents</label><br>
-            <label>3. Puja la base de dades</label><br><br>
-            <form action="/download" method="GET">
-                <label>Descarrega l'última base de dades en el servidor: </label>
+            <label>3. Puja la base de dades</label><br>
+            <p>Un cop pujada la base de dades s'enviarà una actualització a tots els dispositius amb els canvis realitzats.</p>
+            <p>Quan s'obri el mobil, durant la pantalla verda inicial amb les lletres CPL, es baixarà aquesta actualització.</p>
+            <form action="/DownloadDatabaseFromProduction" method="GET">
+                <label>> Descarrega l'última base de dades pujada en el servidor: </label>
                 <button type="submit">Baixar</button>
             </form>
-            <form action="/upload" method="POST" enctype="multipart/form-data">
-                <label>Selecciona la base de dades: </label>
+            <form action="/PublishProduction" method="POST" enctype="multipart/form-data">
+                <label>> Selecciona la base de dades modificada a pujar: </label>
                 <input name="db_file" type="file" accept=".db" />
-                <button type="submit">Pujar</button>
+                <button type="submit"
+                        onclick="return confirm('Estàs segur?');">Pujar</button>
             </form>
         </div>
 
-        <div id="Administrador" class="tabcontent">
-            <form action="/UpdateDatabase" method="POST" enctype="multipart/form-data">
-                <h4>Update Repository Database</h4>
+        <div id="Admin" class="tabcontent">
+            <form action="/UpdateProductionRepositoryDatabase" method="POST" enctype="multipart/form-data">
+                <h4>Update Production Repository Database</h4>
                 <p>When we want to update the App using stores we need to download the latest database from CPL Editorial tab to create the builds.</p>
                 <p>In order to have the local repository of the web updated, with the same latest database, we need to update it.</p>
                 <p>Every deploy from the web we save the database and using the follow action we can update the database project with the latest uploaded.</p>
                 <p>Its very important to do it every time we update the App using the stores, otherwise the deploy would send an incorrect (and older) database to all devices</p>
+                <p>It may fail when never uploaded any database in production before.</p>
                 <button type="submit"
-                        onclick="return confirm('Are you sure?');">Update</button>
+                        onclick="return confirm('Are you sure?');">Update (last uploaded in production -> repository production)</button>
             </form>
             <hr>
-            <form action="/getScript" method="POST" enctype="multipart/form-data">
+            <form action="/GetScripts" method="POST" enctype="multipart/form-data">
                 <h4>Updates Script</h4>
-                <p>Obtain the updates script preview from the current uploaded database in CPL Editorial tab (production). Just for testing purposes</p>
-                <label>Update Id to start (0 to obtain all the changes): </label>
-                <input name="databaseVersion" type="number" />
-                <button type="submit">Get Script</button>
+                <p>Obtain the updates script preview from the production database (last uploaded) or from the one we are uploading now.</p>
+                <p>It may fail when never uploaded any database (prod or test) before.</p>
+                <label>> Check it for production scripts (test otherwise): </label>
+                <input name="getScriptsCheckbox" type="checkbox"><br><br>
+                <label>> Database (only when previous checkbox is unchecked): </label>
+                <input name="db_file" type="file" accept=".db" /><br><br>
+                <label>> Id of the update to start (0 or empty to obtain all updates): </label>
+                <input name="databaseVersion" type="number" /><br><br>
+                <button type="submit">Get Scripts</button>
             </form>
             <hr>
-            <form action="/uploadTest" method="POST" enctype="multipart/form-data">
+            <form action="/PublishTest" method="POST" enctype="multipart/form-data">
                 <h4>Release Update</h4>
                 <p>Release the script updates from the uploaded database to the desired channel using Expo OTA. Make sure it's a test channel!</p>
                 <label>It will:</label><br>
                 <label>1. Save the database in the database test directory</label><br>
-                <label>TODO: wouldnt be the repository database deprecated? pero clar.. tmpoc machacaria la base de dades, qina por. pq en def. es el projecte mateix qe en test. De fet qina por aixo ultim. I si estic fent una prova i faig pull de Test i en aqell moment CPL envia una publicacio? mama mia.... hauré de seperar-ho en 2 projectes no? llavors ja no hi haura problema i guess</label>
                 <label>2. Update repository with the introduced repo branch name</label><br>
                 <label>3. Generate the updates script from the uploaded database</label><br>
                 <label>4. Deploy to the introduced channel</label><br><br>
                 <label>> Repository Branch: </label>
                 <input name="repobranch" type="text" /><br><br>
-                <label>> Release Channel Name: </label>
+                <label>> Release Channel Name (the version will be added "_x.y" at the end): </label>
                 <input name="releasechannel" type="text" /><br><br>
                 <label>> Database: </label>
-                <input name="db_file" type="file" accept=".db" />
+                <input name="db_file" type="file" accept=".db" /><br><br>
                 <button type="submit"
                         onclick="return confirm('Are you sure?');">Publish</button>
             </form>

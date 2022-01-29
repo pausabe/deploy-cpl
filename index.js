@@ -1,7 +1,7 @@
-const ScriptGeneratorService = require("./Services/ScriptGeneratorService");
 const DeployManagerService = require("./Services/DeployManagerService");
+const UpdateDatabaseService = require("./Services/UpdateDatabaseService");
+const ScriptGeneratorService = require("./Services/ScriptGeneratorService");
 const DatabaseKeys = require("./Services/DatabaseKeys");
-const UpdateDatabaseService = require("./Services/UpdateDatabaseService")
 
 const fs = require("fs");
 const basicAuth = require('express-basic-auth');
@@ -19,7 +19,7 @@ const expo_send = process.env.EXPO_SEND;
 const expo_prod_channel = process.env.EXPO_PROD_CHANNEL;
 const app_repo_branch_production = process.env.APP_REPO_BRANCH_PRODUCTION;
 
-var webCredentials = {};
+let webCredentials = {};
 webCredentials[cpl_user] = cpl_pass;
 
 app.use(basicAuth({
@@ -40,91 +40,99 @@ app.get('/', (req, res) => {
     });
 });
 
-app.get('/download', function(req, res){
+app.get('/DownloadDatabaseFromProduction', function(req, res){
   try {
-    console.log("download");
+    console.log("DownloadDatabaseFromProduction");
     res.download(
-      __dirname + DatabaseKeys.DatabaseDirectory + DatabaseKeys.DatabaseName);
+      `${__dirname}/${DatabaseKeys.ScriptsDatabaseDirectoryName}/${DatabaseKeys.DatabaseName}`);
   } catch (error) {
-    console.log("download error", error);
+    console.log("DownloadDatabaseFromProduction error", error);
     res.send('Something went wrong: ' + error);
   }
 });
 
-app.post('/upload', async (req, res) => {
+app.post('/PublishProduction', async (req, res) => {
   try {
-    console.log("upload");
+    console.log("PublishProduction");
     if(!req.files) {
-      console.log("upload: cap base de dades introduïda");
+      console.log("PublishProduction: cap base de dades introduïda");
       res.send('Error: cap base de dades introduïda');
     } 
     else {
       await PublishDatabaseChangesProduction(req.files.db_file);
-      console.log("upload: Publicació realitzada correctament");
+      console.log("PublishProduction: Publicació realitzada correctament");
       res.send('Publicació realitzada correctament');
     }
   } 
   catch (err) {
-    console.log("upload error", err);
+    console.log("PublishProduction error", err);
     res.status(500).send(err);
   }
 });
 
-app.post('/uploadTest', async (req, res) => {
+app.post('/UpdateProductionRepositoryDatabase', async (req, res) => {
   try {
-    console.log("upload-test");
-    if(!req.files) {
-      console.log("upload: cap base de dades introduïda");
-      res.send('Error: cap base de dades introduïda');
-    } 
-    else if(!req.body.repobranch) {
-      console.log("upload: cap repo introduït");
-      res.send('Error: cap repo introduït');
-    }
-    else if(!req.body.releasechannel) {
-      console.log("upload: cap channel introduït");
-      res.send('Error: cap channel introduït');
-    }
-    else{
-      DatabaseKeys.DatabaseDirectory = DatabaseKeys.DatabaseDirectoryTest;
-      await PublishDatabaseChangesTest(req.files.db_file, req.body.repobranch, req.body.releasechannel);
-      console.log("upload: Publicació realitzada correctament");
-      res.send('Publicació realitzada correctament');
-    }
-  } 
-  catch (err) {
-    console.log("upload error", err);
-    res.status(500).send(err);
-  }
-});
-
-app.post('/UpdateDatabase', async (req, res) => {
-  try {
-    console.log("UpdateDatabase");
+    console.log("UpdateProductionRepositoryDatabase");
     await UpdateDatabaseService.UpdateDatabase();
     console.log("Updated correctly");
     res.send("Updated correctly");
   } 
   catch (err) {
-    console.log("update database error", err);
+    console.log("UpdateProductionRepositoryDatabase error", err);
     res.status(500).send(err);
   }
 });
 
-app.post('/getScript', async (req, res) => {
+app.post('/GetScripts', async (req, res) => {
   try {
-    console.log("get-script");
-
-    if(!req.body.databaseVersion) {
-      console.log("Script: cap valor introduït");
-      res.send('Error: cap valor introduït');
+    console.log("GetScripts");
+    const scriptsFromTest = req.body.getScriptsCheckbox === undefined || req.body.getScriptsCheckbox.checked === false;
+    if(scriptsFromTest && !req.files){
+      console.log("GetScripts: cap base de dades introduïda");
+      res.send('Error: cap base de dades introduïda');
     }
-    else {
-      res.send(await ScriptGeneratorService.GenerateJsonScript(req.body.databaseVersion));
+    else{
+      if(scriptsFromTest){
+        await DeployManagerService.SaveUploadedDatabase(req.files.db_file, DatabaseKeys.ScriptsDatabaseDirectoryNameTest);
+      }
+      const databaseVersion = req.body.databaseVersion === undefined || req.body.databaseVersion === ""? 0 : req.body.databaseVersion;
+      res.send(
+          await ScriptGeneratorService.GenerateJsonScript(
+              databaseVersion,
+              scriptsFromTest
+                  ? DatabaseKeys.ScriptsDatabaseDirectoryNameTest
+                  : DatabaseKeys.ScriptsDatabaseDirectoryName));
     }
   } 
   catch (err) {
-    console.log("script error", err);
+    console.log("GetScripts error", err);
+    res.status(500).send(err);
+  }
+});
+
+app.post('/PublishTest', async (req, res) => {
+  try {
+    console.log("PublishTest");
+    if(!req.files) {
+      console.log("PublishTest: cap base de dades introduïda");
+      res.send('Error: cap base de dades introduïda');
+    }
+    else if(!req.body.repobranch) {
+      console.log("PublishTest: cap repo introduït");
+      res.send('Error: cap repo introduït');
+    }
+    else if(!req.body.releasechannel) {
+      console.log("PublishTest: cap channel introduït");
+      res.send('Error: cap channel introduït');
+    }
+    else{
+      await PublishDatabaseChangesTest(req.files.db_file, req.body.repobranch, req.body.releasechannel);
+      console.log("PublishTest: Publicació realitzada correctament");
+      res.send('Publicació realitzada correctament');
+    }
+  }
+  catch (err) {
+    console.log("PublishTest error", err);
     res.status(500).send(err);
   }
 });
@@ -135,30 +143,36 @@ app.listen(port, () => {
 
 async function PublishDatabaseChangesProduction(uploadedDatabase){
   await PublishDatabaseChanges(
-    uploadedDatabase,
-    true,
-    app_repo_branch_production,
-    expo_prod_channel);
+      uploadedDatabase,
+      DatabaseKeys.ScriptsDatabaseDirectoryName,
+      true,
+      app_repo_branch_production,
+      DatabaseKeys.RepositoryDirectoryName,
+      expo_prod_channel);
 }
 
-async function PublishDatabaseChangesTest(uploadedDatabase, repoBranch, otaChannel){
+async function PublishDatabaseChangesTest(uploadedDatabase, repoBranch, expoTestChannel){
   await PublishDatabaseChanges(
       uploadedDatabase,
+      DatabaseKeys.ScriptsDatabaseDirectoryNameTest,
       false,
       repoBranch,
-      otaChannel);
+      DatabaseKeys.RepositoryDirectoryNameTest,
+      expoTestChannel);
 }
 
 async function PublishDatabaseChanges(
   uploadedDatabase,
+  scriptDatabaseDirectoryName,
   backCurrentDatabase,
   appRepoBranch,
+  repositoryDirectoryName,
   expoReleaseChannel){
     if(backCurrentDatabase){
-      await DeployManagerService.BackUpCurrentDatabase();
+      await DeployManagerService.BackUpLastSavedDatabase();
     }
-    await DeployManagerService.SaveUploadedDatabase(uploadedDatabase);
+    await DeployManagerService.SaveUploadedDatabase(uploadedDatabase, scriptDatabaseDirectoryName);
     await DeployManagerService.UpdateAppRepository(appRepoBranch);
-    await DeployManagerService.GenerateChangesScriptIntoAppProject();
-    await DeployManagerService.DeployAppProject(expoReleaseChannel, expo_user, expo_pass, expo_send);
+    await DeployManagerService.GenerateChangesScriptFileIntoAppProject(repositoryDirectoryName, scriptDatabaseDirectoryName);
+    await DeployManagerService.DeployAppProject(expoReleaseChannel, repositoryDirectoryName, expo_user, expo_pass, expo_send);
 }

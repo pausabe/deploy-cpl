@@ -11,12 +11,20 @@ RUN npm install sqlite3 --build-from-source
 RUN git clone https://github.com/pausabe/cpl-app cpl-app\
     && cd cpl-app\
     && git checkout master\
-    && cd ..
+    && cd .. \
+    && git clone https://github.com/pausabe/cpl-app cpl-app-test\
+    && cd cpl-app-test\
+    && git checkout master\
+    && cd .. \
 
 WORKDIR /opt/deploy-cpl/cpl-app
 RUN npm install
 RUN expo install react-native-safe-area-context
 WORKDIR /opt/deploy-cpl
+
+RUN mkdir /opt/deploy-cpl/database
+RUN mkdir /opt/deploy-cpl/database-test
+RUN mkdir /opt/usb
 
 COPY deploy-cpl.sh .
 COPY index.js .
@@ -24,11 +32,9 @@ COPY Services/ ./Services
 COPY Utils/ ./Utils
 COPY index.html .
 COPY /db/cpl-app.db ./cpl-app/src/Assets/db/
+COPY /db/cpl-app.db ./database/
+COPY /db/cpl-app.db ./database-test/
 COPY UpdateAppRepository.sh .
-
-RUN mkdir /opt/deploy-cpl/database
-RUN mkdir /opt/deploy-cpl/databaseTest
-RUN mkdir /opt/usb
 
 EXPOSE 3000
 
