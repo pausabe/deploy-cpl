@@ -27,14 +27,14 @@ async function GenerateChangesScriptFileIntoAppProject(repositoryDirectoryName, 
     await FileSystemService.WriteStringInFile(scriptFilePath, JSON.stringify(jsonScript));
 }
 
-async function UpdateAppRepository(appRepoBranch){
+async function UpdateAppRepository(repositoryDirectoryName, appRepoBranch){
     console.log("Updating Repository from branch: " + appRepoBranch);
     return new Promise((resolve, reject) => {
         shell.exec(
-        `sh UpdateAppRepository.sh ${appRepoBranch}`, 
+        `sh UpdateAppRepository.sh ${repositoryDirectoryName} ${appRepoBranch}`,
         async (err, stdout, stderr) => {
             if(err){
-                reject();
+                reject(err);
             }
             else{
                 resolve();

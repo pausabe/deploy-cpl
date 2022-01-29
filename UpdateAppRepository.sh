@@ -1,4 +1,4 @@
 #!/bin/sh
-cd cpl-app
-git checkout $1
+cd $1
+git checkout $2
 git pull

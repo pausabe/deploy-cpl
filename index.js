@@ -172,7 +172,7 @@ async function PublishDatabaseChanges(
       await DeployManagerService.BackUpLastSavedDatabase();
     }
     await DeployManagerService.SaveUploadedDatabase(uploadedDatabase, scriptDatabaseDirectoryName);
-    await DeployManagerService.UpdateAppRepository(appRepoBranch);
+    await DeployManagerService.UpdateAppRepository(repositoryDirectoryName, appRepoBranch);
     await DeployManagerService.GenerateChangesScriptFileIntoAppProject(repositoryDirectoryName, scriptDatabaseDirectoryName);
     await DeployManagerService.DeployAppProject(expoReleaseChannel, repositoryDirectoryName, expo_user, expo_pass, expo_send);
 }
