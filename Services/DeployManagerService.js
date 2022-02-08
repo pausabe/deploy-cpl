@@ -48,19 +48,20 @@ async function DeployAppProject(expoReleaseChannel, repositoryDirectoryName, exp
         let currentAppVersion = GetCurrentAppVersion(repositoryDirectoryName);
         let channelName = expoReleaseChannel + "_" + currentAppVersion;
         console.log("Deploying App in channel: " + channelName);
-        console.log("DatabaseKeys.AvoidDeploy", DatabaseKeys.DeployActivated);
-        if(DatabaseKeys.DeployActivated && expoReleaseChannel !== "prod_channel"){ // TODO: remove prod_channel check
+        console.log("DatabaseKeys.DeployActivated", DatabaseKeys.DeployActivated);
+        if(DatabaseKeys.DeployActivated){
             shell.exec(
                 `sh deploy-cpl.sh ${expo_user} ${expo_pass} ${expo_send} ${channelName}`, 
                 async (err, stdout, stderr) => {
                     if(err){
-                        reject();
+                        console.log("deploy script finished with error", err);
+                        reject("Error when trying to deploy the update");
                     }
                     else{
+                        console.log("deploy script finished correctly");
                         resolve();
                     }
                 });
-            resolve();
         }
         else{
             resolve();

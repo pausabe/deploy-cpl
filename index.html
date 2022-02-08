@@ -54,6 +54,7 @@
             <label>1. Descarrega la base de dades</label><br>
             <label>2. Fes les modificacions pertinents</label><br>
             <label>3. Puja la base de dades</label><br>
+            <label>4. Espera fins que la pàgina s'ha carregat del tot i surt un missatge de confirmació (a vegades pot tardar molt, 10 minuts o més)</label><br>
             <p>Un cop pujada la base de dades s'enviarà una actualització a tots els dispositius amb els canvis realitzats.</p>
             <p>Quan s'obri el mobil, durant la pantalla verda inicial amb les lletres CPL, es baixarà aquesta actualització.</p>
             <form action="/DownloadDatabaseFromProduction" method="GET">
@@ -113,7 +114,7 @@
         </div>
 
         <script>
-            function openTab(evt, cityName) {
+            function openTab(evt, tabName) {
                 var i, tabcontent, tablinks;
                 tabcontent = document.getElementsByClassName("tabcontent");
                 for (i = 0; i < tabcontent.length; i++) {
@@ -123,7 +124,7 @@
                 for (i = 0; i < tablinks.length; i++) {
                     tablinks[i].className = tablinks[i].className.replace(" active", "");
                 }
-                document.getElementById(cityName).style.display = "block";
+                document.getElementById(tabName).style.display = "block";
                 evt.currentTarget.className += " active";
             }
         </script>

@@ -19,7 +19,12 @@ RUN git clone https://github.com/pausabe/cpl-app cpl-app\
 
 WORKDIR /opt/deploy-cpl/cpl-app
 RUN npm install
-RUN expo install react-native-safe-area-context
+RUN expo install react-native-safe-area-context@3.2.0
+WORKDIR /opt/deploy-cpl
+
+WORKDIR /opt/deploy-cpl/cpl-app-test
+RUN npm install
+RUN expo install react-native-safe-area-context@3.2.0
 WORKDIR /opt/deploy-cpl
 
 RUN mkdir /opt/deploy-cpl/database
@@ -32,6 +37,7 @@ COPY Services/ ./Services
 COPY Utils/ ./Utils
 COPY index.html .
 COPY /db/cpl-app.db ./cpl-app/src/Assets/db/
+COPY /db/cpl-app.db ./cpl-app-test/src/Assets/db/
 COPY /db/cpl-app.db ./database/
 COPY /db/cpl-app.db ./database-test/
 COPY UpdateAppRepository.sh .
