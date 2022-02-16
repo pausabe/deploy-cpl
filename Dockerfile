@@ -15,7 +15,7 @@ RUN git clone https://github.com/pausabe/cpl-app cpl-app\
     && git clone https://github.com/pausabe/cpl-app cpl-app-test\
     && cd cpl-app-test\
     && git checkout master\
-    && cd .. \
+    && cd ..
 
 WORKDIR /opt/deploy-cpl/cpl-app
 RUN npm install
