@@ -51,12 +51,12 @@
         </div>
 
         <div id="CPL" class="tabcontent">
-            <label>1. Descarrega la base de dades</label><br>
-            <label>2. Fes les modificacions pertinents</label><br>
-            <label>3. Puja la base de dades</label><br>
-            <label>4. Espera fins que la pàgina s'ha carregat del tot i surt un missatge de confirmació (a vegades pot tardar molt, 10 minuts o més)</label><br>
-            <p>Un cop pujada la base de dades s'enviarà una actualització a tots els dispositius amb els canvis realitzats.</p>
-            <p>Quan s'obri el mobil, durant la pantalla verda inicial amb les lletres CPL, es baixarà aquesta actualització.</p>
+            <label>1. Descarrega la base de dades (botó 'Baixar')</label><br>
+            <label>2. Fes les modificacions necessàries al teu ordinador</label><br>
+            <label>3. Publica la nova base de dades (seleccionant-la i clicant 'Publicar'</label><br>
+            <label>4. Espera fins que la pàgina s'ha carregat del tot i surt un missatge de confirmació (a vegades pot tardar molt, 10 minuts o més)</label><br><br>
+            <label>Un cop pujada la base de dades s'enviarà una actualització a tots els dispositius amb els canvis realitzats.</label><br>
+            <label>Quan s'obri el mobil, durant la pantalla verda inicial amb les lletres CPL, es baixarà aquesta actualització.</label><br><br>
             <form action="/DownloadDatabaseFromProduction" method="GET">
                 <label>> Descarrega l'última base de dades pujada en el servidor: </label>
                 <button type="submit">Baixar</button>
@@ -65,7 +65,7 @@
                 <label>> Selecciona la base de dades modificada: </label>
                 <input name="db_file" type="file" accept=".db" />
                 <button type="submit"
-                        onclick="return confirm('Estàs segur?');">Enviar Actualització</button>
+                        onclick="return confirm('Estàs segur?');">Publicar</button>
             </form>
         </div>
 
