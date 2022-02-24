@@ -1,11 +1,8 @@
 module.exports = {
     RepositoryDirectoryName: 'cpl-app',
     RepositoryDirectoryNameTest: 'cpl-app-test',
-    ScriptsDatabaseDirectoryName: 'database',
-    ScriptsDatabaseDirectoryNameTest: 'database-test',
-    ScriptsDatabaseBackupDirectory: './opt/usb/',
-    AppProjectDatabasePath: "/src/Assets/",
+    DatabaseBackupDirectory: '/opt/usb/',
+    AppProjectDatabasePath: "/src/Assets/db/",
     DatabaseName: 'cpl-app.db',
-    ScriptsPath: "/src/Assets/DatabaseUpdateScript/UpdateScript.json",
     DeployActivated: true
 }

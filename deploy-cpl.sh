@@ -1,6 +1,6 @@
 #!/bin/sh
-cd cpl-app-test
+cd $1
 npm install
 expo install react-native-safe-area-context@3.2.0
-expo login -u $1 -p $2 --non-interactive
-expo publish --quiet --send-to $3 --release-channel $4 --non-interactive
+expo login -u $2 -p $3 --non-interactive
+expo publish --quiet --send-to $4 --release-channel $5 --non-interactive

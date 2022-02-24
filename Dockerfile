@@ -27,8 +27,6 @@ RUN npm install
 RUN expo install react-native-safe-area-context@3.2.0
 WORKDIR /opt/deploy-cpl
 
-RUN mkdir /opt/deploy-cpl/database
-RUN mkdir /opt/deploy-cpl/database-test
 RUN mkdir /opt/usb
 
 COPY deploy-cpl.sh .
@@ -38,8 +36,6 @@ COPY Utils/ ./Utils
 COPY index.html .
 COPY /db/cpl-app.db ./cpl-app/src/Assets/db/
 COPY /db/cpl-app.db ./cpl-app-test/src/Assets/db/
-COPY /db/cpl-app.db ./database/
-COPY /db/cpl-app.db ./database-test/
 COPY UpdateAppRepository.sh .
 
 EXPOSE 3000

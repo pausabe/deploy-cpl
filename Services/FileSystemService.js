@@ -27,7 +27,7 @@ async function CopyFile(originPath, destinationPath){
                 fs.copyFile(originPath, destinationPath, () => resolve());
             }
             else{
-                reject("Origin file path doesn't exist");
+                reject(`Origin file path (${originPath}) doesn't exist`);
             }
         } 
         catch (error) {

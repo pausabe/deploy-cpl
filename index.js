@@ -1,6 +1,4 @@
 const DeployManagerService = require("./Services/DeployManagerService");
-const UpdateDatabaseService = require("./Services/UpdateDatabaseService");
-const ScriptGeneratorService = require("./Services/ScriptGeneratorService");
 const DatabaseKeys = require("./Services/DatabaseKeys");
 
 const fs = require("fs");
@@ -44,7 +42,7 @@ app.get('/DownloadDatabaseFromProduction', function(req, res){
   try {
     console.log("DownloadDatabaseFromProduction");
     res.download(
-      `${__dirname}/${DatabaseKeys.ScriptsDatabaseDirectoryName}/${DatabaseKeys.DatabaseName}`);
+      `${__dirname}/${DatabaseKeys.RepositoryDirectoryName}${DatabaseKeys.AppProjectDatabasePath}${DatabaseKeys.DatabaseName}`);
   } catch (error) {
     console.log("DownloadDatabaseFromProduction error", error);
     res.send('Something went wrong: ' + error);
@@ -66,46 +64,6 @@ app.post('/PublishProduction', async (req, res) => {
   } 
   catch (err) {
     console.log("PublishProduction error", err);
-    res.status(500).send(err);
-  }
-});
-
-app.post('/UpdateProductionRepositoryDatabase', async (req, res) => {
-  try {
-    console.log("UpdateProductionRepositoryDatabase");
-    await UpdateDatabaseService.UpdateDatabase();
-    console.log("Updated correctly");
-    res.send("Updated correctly");
-  } 
-  catch (err) {
-    console.log("UpdateProductionRepositoryDatabase error", err);
-    res.status(500).send(err);
-  }
-});
-
-app.post('/GetScripts', async (req, res) => {
-  try {
-    console.log("GetScripts");
-    const scriptsFromTest = req.body.getScriptsCheckbox === undefined || req.body.getScriptsCheckbox.checked === false;
-    if(scriptsFromTest && !req.files){
-      console.log("GetScripts: cap base de dades introduïda");
-      res.send('Error: cap base de dades introduïda');
-    }
-    else{
-      if(scriptsFromTest){
-        await DeployManagerService.SaveUploadedDatabase(req.files.db_file, DatabaseKeys.ScriptsDatabaseDirectoryNameTest);
-      }
-      const databaseVersion = req.body.databaseVersion === undefined || req.body.databaseVersion === ""? 0 : req.body.databaseVersion;
-      res.send(
-          await ScriptGeneratorService.GenerateJsonScript(
-              databaseVersion,
-              scriptsFromTest
-                  ? DatabaseKeys.ScriptsDatabaseDirectoryNameTest
-                  : DatabaseKeys.ScriptsDatabaseDirectoryName));
-    }
-  } 
-  catch (err) {
-    console.log("GetScripts error", err);
     res.status(500).send(err);
   }
 });
@@ -141,20 +99,18 @@ app.listen(port, () => {
     console.log(`CPL web at port ${port}`);
 })
 
-async function PublishDatabaseChangesProduction(uploadedDatabase){
+async function PublishDatabaseChangesProduction(databaseFile){
   await PublishDatabaseChanges(
-      uploadedDatabase,
-      DatabaseKeys.ScriptsDatabaseDirectoryName,
+      databaseFile,
       true,
       app_repo_branch_production,
       DatabaseKeys.RepositoryDirectoryName,
       expo_prod_channel);
 }
 
-async function PublishDatabaseChangesTest(uploadedDatabase, repoBranch, expoTestChannel){
+async function PublishDatabaseChangesTest(databaseFile, repoBranch, expoTestChannel){
   await PublishDatabaseChanges(
-      uploadedDatabase,
-      DatabaseKeys.ScriptsDatabaseDirectoryNameTest,
+      databaseFile,
       false,
       repoBranch,
       DatabaseKeys.RepositoryDirectoryNameTest,
@@ -162,17 +118,15 @@ async function PublishDatabaseChangesTest(uploadedDatabase, repoBranch, expoTest
 }
 
 async function PublishDatabaseChanges(
-  uploadedDatabase,
-  scriptDatabaseDirectoryName,
-  backCurrentDatabase,
-  appRepoBranch,
-  repositoryDirectoryName,
-  expoReleaseChannel){
+    databaseFile,
+    backCurrentDatabase,
+    appRepoBranch,
+    repositoryDirectoryName,
+    expoReleaseChannel){
+    await DeployManagerService.MoveDatabaseInsideProject(repositoryDirectoryName, databaseFile);
     if(backCurrentDatabase){
-      await DeployManagerService.BackUpLastSavedDatabase();
+      await DeployManagerService.BackUpDatabase(repositoryDirectoryName);
     }
-    await DeployManagerService.SaveUploadedDatabase(uploadedDatabase, scriptDatabaseDirectoryName);
     await DeployManagerService.UpdateAppRepository(repositoryDirectoryName, appRepoBranch);
-    await DeployManagerService.GenerateChangesScriptFileIntoAppProject(repositoryDirectoryName, scriptDatabaseDirectoryName);
     await DeployManagerService.DeployAppProject(expoReleaseChannel, repositoryDirectoryName, expo_user, expo_pass, expo_send);
 }
