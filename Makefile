@@ -7,11 +7,16 @@ clean:
 	docker rm deploy-cpl
 run:
 	docker run -d --name=deploy-cpl -d --restart unless-stopped -p 3000:3000 --env-file secrets.env -v /mnt/usb:/opt/usb deploy-cpl
-rerun:
+rerun-local:
 	docker stop deploy-cpl
 	docker rm deploy-cpl
 	docker build -t deploy-cpl .
 	docker run -d --name=deploy-cpl -d --restart unless-stopped -p 3000:3000 --env-file secrets.env deploy-cpl
+rerun-server:
+	docker stop deploy-cpl
+	docker rm deploy-cpl
+	docker build -t deploy-cpl .
+	docker run -d --name=deploy-cpl -d --restart unless-stopped -p 3000:3000 --env-file secrets.env deploy-cpl -v /mnt/usb:/opt/usb deploy-cpl
 run-single:
 	docker run --rm deploy-cpl
 run-terminal:
