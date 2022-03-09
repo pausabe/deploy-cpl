@@ -5,7 +5,9 @@ build-no-cache:
 clean:
 	docker stop deploy-cpl
 	docker rm deploy-cpl
-run:
+run-local:
+	docker run -d --name=deploy-cpl -d --restart unless-stopped -p 3000:3000 --env-file secrets.env deploy-cpl
+run-server:
 	docker run -d --name=deploy-cpl -d --restart unless-stopped -p 3000:3000 --env-file secrets.env -v /mnt/usb:/opt/usb deploy-cpl
 rerun-local:
 	docker stop deploy-cpl
