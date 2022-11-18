@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require('fs');
 
 async function MoveFile(oldFilePath, newFilePath){
     return new Promise((resolve, reject) => {
@@ -7,14 +7,17 @@ async function MoveFile(oldFilePath, newFilePath){
                 console.log("Moving file from " + oldFilePath + " to " + newFilePath);
                 fs.rename(oldFilePath, newFilePath, (err) => {
                     if(err){
-                        console.log("Error moving the file:", err);
+                        console.log(err);
+                        reject("Error moving the file");
                     }
-                    resolve()
+                    else{
+                        resolve()
+                    }
                 });
             }
             else{
                 console.log("No file to move");
-                resolve();
+                reject();
             }
         } 
         catch (error) {
@@ -29,12 +32,16 @@ async function CopyFile(originPath, destinationPath){
         try {
             if(fs.existsSync(originPath)){
                 console.log("Copying file from " + originPath + " to " + destinationPath);
-                fs.copyFile(originPath, destinationPath, (err) => {
+                fs.copyFileSync(originPath, destinationPath);
+                /*fs.copyFile(originPath, destinationPath, (err) => {
                     if(err){
-                        console.log("Error copying the file:", err);
+                        console.log(err);
+                        reject("Error copying the file")
                     }
-                    resolve()
-                });
+                    else{
+                        resolve()
+                    }
+                });*/
             }
             else{
                 reject(`Origin file path (${originPath}) doesn't exist`);
