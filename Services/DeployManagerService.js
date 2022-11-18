@@ -6,6 +6,7 @@ const FileSystemService = require("./FileSystemService");
 async function MoveDatabaseInsideProject(repositoryDirectoryName, databaseFile){
     let databaseFilePath = `./${repositoryDirectoryName}${DatabaseKeys.AppProjectDatabasePath}${DatabaseKeys.DatabaseName}`;
     console.log("Moving Uploaded Database into: " + databaseFilePath);
+    // TODO: I should use FileSystemService.MoveFile but I guess it doesn't work as well as .mv... I don't remember
     databaseFile.mv(databaseFilePath);
 }
 

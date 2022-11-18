@@ -111,7 +111,7 @@ async function PublishDatabaseChangesProduction(databaseFile){
 async function PublishDatabaseChangesTest(databaseFile, repoBranch, expoTestChannel){
   await PublishDatabaseChanges(
       databaseFile,
-      true,
+      false,
       repoBranch,
       DatabaseKeys.RepositoryDirectoryNameTest,
       expoTestChannel);

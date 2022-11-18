@@ -33,15 +33,6 @@ async function CopyFile(originPath, destinationPath){
             if(fs.existsSync(originPath)){
                 console.log("Copying file from " + originPath + " to " + destinationPath);
                 fs.copyFileSync(originPath, destinationPath);
-                /*fs.copyFile(originPath, destinationPath, (err) => {
-                    if(err){
-                        console.log(err);
-                        reject("Error copying the file")
-                    }
-                    else{
-                        resolve()
-                    }
-                });*/
             }
             else{
                 reject(`Origin file path (${originPath}) doesn't exist`);
