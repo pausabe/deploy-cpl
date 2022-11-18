@@ -5,7 +5,12 @@ async function MoveFile(oldFilePath, newFilePath){
         try {
             if(fs.existsSync(oldFilePath)){
                 console.log("Moving file from " + oldFilePath + " to " + newFilePath);
-                fs.rename(oldFilePath, newFilePath, () => resolve());
+                fs.rename(oldFilePath, newFilePath, (err) => {
+                    if(err){
+                        console.log("Error moving the file:", err);
+                    }
+                    resolve()
+                });
             }
             else{
                 console.log("No file to move");
@@ -24,14 +29,19 @@ async function CopyFile(originPath, destinationPath){
         try {
             if(fs.existsSync(originPath)){
                 console.log("Copying file from " + originPath + " to " + destinationPath);
-                fs.copyFile(originPath, destinationPath, () => resolve());
+                fs.copyFile(originPath, destinationPath, (err) => {
+                    if(err){
+                        console.log("Error copying the file:", err);
+                    }
+                    resolve()
+                });
             }
             else{
                 reject(`Origin file path (${originPath}) doesn't exist`);
             }
         } 
         catch (error) {
-            console.log("Error moving the file:", error);
+            console.log("Error copying the file:", error);
             resolve();
         }
     });

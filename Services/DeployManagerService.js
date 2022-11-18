@@ -11,7 +11,7 @@ async function MoveDatabaseInsideProject(repositoryDirectoryName, databaseFile){
 
 async function BackUpDatabase(repositoryDirectoryName){
     let today = new Date();
-    let backupName = today.getMonth().toString() + today.getDay().toString() + today.getFullYear().toString() + "_" + DatabaseKeys.DatabaseName;
+    let backupName = today.getMinutes().toString() + "_" + today.getDay().toString() + "_" + (today.getMonth() + 1).toString() + "_" + today.getFullYear().toString();
     let databaseFilePath = `./${repositoryDirectoryName}${DatabaseKeys.AppProjectDatabasePath}${DatabaseKeys.DatabaseName}`;
     let backupFilePath = DatabaseKeys.DatabaseBackupDirectory + backupName;
     console.log("Back up -> " + backupFilePath);
@@ -40,7 +40,7 @@ async function DeployAppProject(expoReleaseChannel, repositoryDirectoryName, exp
         let channelName = expoReleaseChannel + "_" + currentAppBuildNumber;
         console.log("Deploying App in channel: " + channelName);
         console.log("DatabaseKeys.DeployActivated", DatabaseKeys.DeployActivated);
-        if(DatabaseKeys.DeployActivated){
+        if(DatabaseKeys.DeployActivated === 'true'){
             shell.exec(
                 `sh deploy-cpl.sh ${repositoryDirectoryName} ${expo_user} ${expo_pass} ${expo_send} ${channelName}`,
                 async (err, stdout, stderr) => {
