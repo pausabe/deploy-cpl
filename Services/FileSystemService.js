@@ -33,7 +33,7 @@ async function CopyFile(originPath, destinationPath){
         try {
             if(fs.existsSync(originPath)){
                 Logger.Log(Logger.LogKeys.FileSystemService, "CopyFile", "Copying file from " + originPath + " to " + destinationPath);
-                fs.copyFileSync(originPath, destinationPath, (err) => {
+                fs.copyFile(originPath, destinationPath, (err) => {
                     if(err){
                         Logger.Log(Logger.LogKeys.FileSystemService, "CopyFile", "", err);
                         reject("Error copying the file");
