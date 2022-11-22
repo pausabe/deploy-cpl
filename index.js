@@ -7,7 +7,6 @@ const basicAuth = require('express-basic-auth');
 const express = require('express');
 const app = express();
 const fileUpload = require('express-fileupload');
-const {LogKeys} = require("./Utils/Logger");
 
 const port = 3000;
 
@@ -42,57 +41,57 @@ app.get('/', (req, res) => {
 
 app.get('/DownloadDatabaseFromProduction', function (req, res) {
     try {
-        Logger.Log(LogKeys.IndexJS, "DownloadDatabaseFromProduction", "Starting Download");
+        Logger.Log(Logger.LogKeys.IndexJS, "DownloadDatabaseFromProduction", "Starting Download");
         res.download(
             `${__dirname}/${DatabaseKeys.RepositoryDirectoryName}${DatabaseKeys.AppProjectDatabasePath}${DatabaseKeys.DatabaseName}`);
     } catch (err) {
-        Logger.LogError(LogKeys.IndexJS, "DownloadDatabaseFromProduction", err);
+        Logger.LogError(Logger.LogKeys.IndexJS, "DownloadDatabaseFromProduction", err);
         res.send('Something went wrong: ' + err);
     }
 });
 
 app.post('/PublishProduction', async (req, res) => {
     try {
-        Logger.Log(LogKeys.IndexJS, "PublishProduction", "Starting Release in production");
+        Logger.Log(Logger.LogKeys.IndexJS, "PublishProduction", "Starting Release in production");
         if (!req.files) {
-            Logger.Log(LogKeys.IndexJS, "PublishProduction", "PublishProduction: cap base de dades introduïda");
+            Logger.Log(Logger.LogKeys.IndexJS, "PublishProduction", "PublishProduction: cap base de dades introduïda");
             res.send('Error: cap base de dades introduïda');
         } else {
             await PublishDatabaseChangesProduction(req.files.db_file);
-            Logger.Log(LogKeys.IndexJS, "PublishProduction", "Publicació realitzada correctament");
+            Logger.Log(Logger.LogKeys.IndexJS, "PublishProduction", "Publicació realitzada correctament");
             res.send('Publicació realitzada correctament');
         }
     } catch (err) {
-        Logger.LogError(LogKeys.IndexJS, "PublishProduction", err);
+        Logger.LogError(Logger.LogKeys.IndexJS, "PublishProduction", err);
         res.status(500).send(err);
     }
 });
 
 app.post('/PublishTest', async (req, res) => {
     try {
-        Logger.Log(LogKeys.IndexJS, "PublishTest", "Starting Release in test");
+        Logger.Log(Logger.LogKeys.IndexJS, "PublishTest", "Starting Release in test");
         if (!req.files) {
-            Logger.Log(LogKeys.IndexJS, "PublishTest", "cap base de dades introduïda");
+            Logger.Log(Logger.LogKeys.IndexJS, "PublishTest", "cap base de dades introduïda");
             res.send('Error: cap base de dades introduïda');
         } else if (!req.body.repobranch) {
-            Logger.Log(LogKeys.IndexJS, "PublishTest", "cap repo introduït");
+            Logger.Log(Logger.LogKeys.IndexJS, "PublishTest", "cap repo introduït");
             res.send('Error: cap repo introduït');
         } else if (!req.body.releasechannel) {
-            Logger.Log(LogKeys.IndexJS, "PublishTest", "cap channel introduït");
+            Logger.Log(Logger.LogKeys.IndexJS, "PublishTest", "cap channel introduït");
             res.send('Error: cap channel introduït');
         } else {
             await PublishDatabaseChangesTest(req.files.db_file, req.body.repobranch, req.body.releasechannel);
-            Logger.Log(LogKeys.IndexJS, "PublishTest", "Publicació realitzada correctament");
+            Logger.Log(Logger.LogKeys.IndexJS, "PublishTest", "Publicació realitzada correctament");
             res.send('Publicació realitzada correctament');
         }
     } catch (err) {
-        Logger.LogError(LogKeys.IndexJS, "PublishTest", err);
+        Logger.LogError(Logger.LogKeys.IndexJS, "PublishTest", err);
         res.status(500).send(err);
     }
 });
 
 app.listen(port, () => {
-    Logger.Log(LogKeys.IndexJS, "listen", "CPL web at port:", port);
+    Logger.Log(Logger.LogKeys.IndexJS, "listen", "CPL web at port:", port);
 })
 
 async function PublishDatabaseChangesProduction(databaseFile) {

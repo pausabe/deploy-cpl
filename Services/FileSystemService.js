@@ -1,5 +1,3 @@
-import {LogKeys} from "../Utils/Logger";
-
 const fs = require('fs');
 import * as Logger from '../Utils/Logger';
 
@@ -7,10 +5,10 @@ async function MoveFile(oldFilePath, newFilePath){
     return new Promise((resolve, reject) => {
         try {
             if(fs.existsSync(oldFilePath)){
-                Logger.Log(LogKeys.FileSystemService, "MoveFile", "Moving file from " + oldFilePath + " to " + newFilePath);
+                Logger.Log(Logger.LogKeys.FileSystemService, "MoveFile", "Moving file from " + oldFilePath + " to " + newFilePath);
                 fs.rename(oldFilePath, newFilePath, (err) => {
                     if(err){
-                        Logger.Log(LogKeys.FileSystemService, "MoveFile", "", err);
+                        Logger.Log(Logger.LogKeys.FileSystemService, "MoveFile", "", err);
                         reject("Error moving the file");
                     }
                     else{
@@ -19,12 +17,12 @@ async function MoveFile(oldFilePath, newFilePath){
                 });
             }
             else{
-                Logger.Log(LogKeys.FileSystemService, "MoveFile", "No file to move");
+                Logger.Log(Logger.LogKeys.FileSystemService, "MoveFile", "No file to move");
                 reject();
             }
         } 
         catch (error) {
-            Logger.LogError(LogKeys.FileSystemService, "MoveFile", error);
+            Logger.LogError(Logger.LogKeys.FileSystemService, "MoveFile", error);
             resolve();
         }
     });
@@ -34,14 +32,14 @@ async function CopyFile(originPath, destinationPath){
     return new Promise((resolve, reject) => {
         try {
             if(fs.existsSync(originPath)){
-                Logger.Log(LogKeys.FileSystemService, "CopyFile", "Copying file from " + originPath + " to " + destinationPath);
+                Logger.Log(Logger.LogKeys.FileSystemService, "CopyFile", "Copying file from " + originPath + " to " + destinationPath);
                 fs.copyFileSync(originPath, destinationPath, (err) => {
                     if(err){
-                        Logger.Log(LogKeys.FileSystemService, "CopyFile", "", err);
+                        Logger.Log(Logger.LogKeys.FileSystemService, "CopyFile", "", err);
                         reject("Error copying the file");
                     }
                     else{
-                        Logger.Log(LogKeys.FileSystemService, "CopyFile", "File copied correctly");
+                        Logger.Log(Logger.LogKeys.FileSystemService, "CopyFile", "File copied correctly");
                         resolve()
                     }
                 });
@@ -51,7 +49,7 @@ async function CopyFile(originPath, destinationPath){
             }
         } 
         catch (error) {
-            Logger.LogError(LogKeys.FileSystemService, "CopyFile", error);
+            Logger.LogError(Logger.LogKeys.FileSystemService, "CopyFile", error);
             resolve();
         }
     });

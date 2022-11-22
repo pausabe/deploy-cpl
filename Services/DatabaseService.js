@@ -1,4 +1,3 @@
-import {LogKeys} from "../Utils/Logger";
 const DatabaseKeys = require("./DatabaseKeys");
 const sqlite3 = require('sqlite3').verbose();
 import * as Logger from '../Utils/Logger';
@@ -8,7 +7,7 @@ let CPLDataBase = undefined;
 function OpenDatabase(scriptsDatabaseDirectory){
     if(CPLDataBase === undefined){
         const scriptsDatabasePath = `./${scriptsDatabaseDirectory}/${DatabaseKeys.DatabaseName}`;
-        Logger.Log(LogKeys.DatabaseService, "OpenDatabase", "Opening database:", scriptsDatabasePath);
+        Logger.Log(Logger.LogKeys.DatabaseService, "OpenDatabase", "Opening database:", scriptsDatabasePath);
         CPLDataBase = new sqlite3.Database(scriptsDatabasePath);
     }
 }
