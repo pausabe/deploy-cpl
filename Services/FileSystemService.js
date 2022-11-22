@@ -1,13 +1,16 @@
+import {LogKeys} from "../Utils/Logger";
+
 const fs = require('fs');
+import * as Logger from '../Utils/Logger';
 
 async function MoveFile(oldFilePath, newFilePath){
     return new Promise((resolve, reject) => {
         try {
             if(fs.existsSync(oldFilePath)){
-                console.log("Moving file from " + oldFilePath + " to " + newFilePath);
+                Logger.Log(LogKeys.FileSystemService, "MoveFile", "Moving file from " + oldFilePath + " to " + newFilePath);
                 fs.rename(oldFilePath, newFilePath, (err) => {
                     if(err){
-                        console.log(err);
+                        Logger.Log(LogKeys.FileSystemService, "MoveFile", "", err);
                         reject("Error moving the file");
                     }
                     else{
@@ -16,12 +19,12 @@ async function MoveFile(oldFilePath, newFilePath){
                 });
             }
             else{
-                console.log("No file to move");
+                Logger.Log(LogKeys.FileSystemService, "MoveFile", "No file to move");
                 reject();
             }
         } 
         catch (error) {
-            console.log("Error moving the file:", error);
+            Logger.LogError(LogKeys.FileSystemService, "MoveFile", error);
             resolve();
         }
     });
@@ -31,16 +34,24 @@ async function CopyFile(originPath, destinationPath){
     return new Promise((resolve, reject) => {
         try {
             if(fs.existsSync(originPath)){
-                console.log("Copying file from " + originPath + " to " + destinationPath);
-                fs.copyFileSync(originPath, destinationPath);
-                resolve();
+                Logger.Log(LogKeys.FileSystemService, "CopyFile", "Copying file from " + originPath + " to " + destinationPath);
+                fs.copyFileSync(originPath, destinationPath, (err) => {
+                    if(err){
+                        Logger.Log(LogKeys.FileSystemService, "CopyFile", "", err);
+                        reject("Error copying the file");
+                    }
+                    else{
+                        Logger.Log(LogKeys.FileSystemService, "CopyFile", "File copied correctly");
+                        resolve()
+                    }
+                });
             }
             else{
                 reject(`Origin file path (${originPath}) doesn't exist`);
             }
         } 
         catch (error) {
-            console.log("Error copying the file:", error);
+            Logger.LogError(LogKeys.FileSystemService, "CopyFile", error);
             resolve();
         }
     });

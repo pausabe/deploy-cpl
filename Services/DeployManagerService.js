@@ -2,10 +2,12 @@ const DatabaseKeys = require("./DatabaseKeys");
 const shell = require('child_process');
 const fs = require("fs");
 const FileSystemService = require("./FileSystemService");
+const Logger = require("../Utils/Logger");
+const {LogKeys} = require("../Utils/Logger");
 
 async function MoveDatabaseInsideProject(repositoryDirectoryName, databaseFile){
     let databaseFilePath = `./${repositoryDirectoryName}${DatabaseKeys.AppProjectDatabasePath}${DatabaseKeys.DatabaseName}`;
-    console.log("Moving Uploaded Database into: " + databaseFilePath);
+    Logger.Log(LogKeys.DeployManagerService, "MoveDatabaseInsideProject", "Moving Uploaded Database into:", databaseFilePath);
     // TODO: I should use FileSystemService.MoveFile but I guess it doesn't work as well as .mv... I don't remember
     databaseFile.mv(databaseFilePath);
 }
@@ -15,12 +17,12 @@ async function BackUpDatabase(repositoryDirectoryName){
     let backupName = today.getMinutes().toString() + "_" + today.getDate().toString() + "_" + (today.getMonth() + 1).toString() + "_" + today.getFullYear().toString() + ".db";
     let databaseFilePath = `./${repositoryDirectoryName}${DatabaseKeys.AppProjectDatabasePath}${DatabaseKeys.DatabaseName}`;
     let backupFilePath = DatabaseKeys.DatabaseBackupDirectory + backupName;
-    console.log("Back up -> " + backupFilePath);
+    Logger.Log(LogKeys.DeployManagerService, "BackUpDatabase", "Back up to:", backupFilePath);
     await FileSystemService.CopyFile(databaseFilePath, backupFilePath);
 }
 
 async function UpdateAppRepository(repositoryDirectoryName, appRepoBranch){
-    console.log("Updating Repository from branch: " + appRepoBranch);
+    Logger.Log(LogKeys.DeployManagerService, "UpdateAppRepository", "Updating Repository from branch:", appRepoBranch);
     return new Promise((resolve, reject) => {
         shell.exec(
         `sh UpdateAppRepository.sh ${repositoryDirectoryName} ${appRepoBranch}`,
@@ -39,18 +41,16 @@ async function DeployAppProject(expoReleaseChannel, repositoryDirectoryName, exp
     return new Promise((resolve, reject) => {
         let currentAppBuildNumber = GetCurrentAppBuildNumber(repositoryDirectoryName);
         let channelName = expoReleaseChannel + "_" + currentAppBuildNumber;
-        console.log("Deploying App in channel: " + channelName);
-        console.log("DatabaseKeys.DeployActivated", DatabaseKeys.DeployActivated);
+        Logger.Log(LogKeys.DeployManagerService, "DeployAppProject", "Deploying App in channel:", channelName);
         if(DatabaseKeys.DeployActivated === 'true'){
             shell.exec(
                 `sh deploy-cpl.sh ${repositoryDirectoryName} ${expo_user} ${expo_pass} ${expo_send} ${channelName}`,
                 async (err, stdout, stderr) => {
+                    Logger.Log(LogKeys.DeployManagerService, "DeployAppProject", "Deploy script finished " + err? "with an error" : "correctly");
                     if(err){
-                        console.log("deploy script finished with error", err);
                         reject("Error when trying to deploy the update");
                     }
                     else{
-                        console.log("deploy script finished correctly");
                         resolve();
                     }
                 });
