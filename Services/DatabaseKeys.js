@@ -4,5 +4,5 @@ module.exports = {
     DatabaseBackupDirectory: '/opt/usb/',
     AppProjectDatabasePath: "/src/Assets/db/",
     DatabaseName: 'cpl-app.db',
-    DeployActivated: 'false'
+    DeployActivated: 'true'
 }

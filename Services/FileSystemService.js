@@ -34,10 +34,6 @@ async function CopyFile(originPath, destinationPath){
             if(fs.existsSync(originPath)){
                 Logger.Log(Logger.LogKeys.FileSystemService, "CopyFile", "Copying file from " + originPath + " to " + destinationPath);
 
-                fs.stat(originPath, (err, stats) => {
-                    Logger.Log(Logger.LogKeys.FileSystemService, "CopyFile", "Origin Stats", stats);
-                });
-
                 fs.copyFile(originPath, destinationPath, (err) => {
                     if(err){
                         Logger.Log(Logger.LogKeys.FileSystemService, "CopyFile", "", err);
