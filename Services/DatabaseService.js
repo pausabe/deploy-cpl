@@ -1,6 +1,6 @@
 const DatabaseKeys = require("./DatabaseKeys");
 const sqlite3 = require('sqlite3').verbose();
-import * as Logger from '../Utils/Logger';
+const Logger = require('../Utils/Logger');
 
 let CPLDataBase = undefined;
 

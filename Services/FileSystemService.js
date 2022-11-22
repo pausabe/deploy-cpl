@@ -1,5 +1,5 @@
 const fs = require('fs');
-import * as Logger from '../Utils/Logger';
+const Logger = require('../Utils/Logger');
 
 async function MoveFile(oldFilePath, newFilePath){
     return new Promise((resolve, reject) => {

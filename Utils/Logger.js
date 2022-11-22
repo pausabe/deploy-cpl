@@ -1,29 +1,27 @@
-import DatabaseKeys from "../Services/DatabaseKeys";
-
+const DatabaseKeys = require('../Services/DatabaseKeys');
 const LogsEnabled = true;
 const ExportLog = true;
 const MessageCharacterLimit = 500;
 
 let LastLogDay;
-
-export let SessionLogs = "";
+let SessionLogs = "";
 
 const fs = require('fs');
 
-export const LogKeys = {
+const LogKeys = {
     DatabaseService: { name: "DatabaseManagerService", enabled: true },
     DeployManagerService: { name: "DeployManagerService", enabled: true },
     FileSystemService: { name: "FileSystemService", enabled: true },
     IndexJS: { name: "IndexJS", enabled: true },
 };
 
-export function Log(logKey, methodName, message, param = undefined, limit = MessageCharacterLimit){
+function Log(logKey, methodName, message, param = undefined, limit = MessageCharacterLimit){
     if(logKey.enabled){
         log("[" + logKey.name + " - " + methodName + "]", message, param, limit);
     }
 }
 
-export function LogError(logKey, methodName, error = undefined, limit = MessageCharacterLimit) {
+function LogError(logKey, methodName, error = undefined, limit = MessageCharacterLimit) {
     let errorName = "";
     let errorMessage = "";
     let param = "";
@@ -102,3 +100,5 @@ function log(logKey, message, param, limit){
         });
     }
 }
+
+module.exports = { LogKeys, Log, LogError }
