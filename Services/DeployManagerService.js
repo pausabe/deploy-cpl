@@ -45,11 +45,12 @@ async function DeployAppProject(expoReleaseChannel, repositoryDirectoryName, exp
             shell.exec(
                 `sh deploy-cpl.sh ${repositoryDirectoryName} ${expo_user} ${expo_pass} ${expo_send} ${channelName}`,
                 async (err, stdout, stderr) => {
-                    Logger.Log(Logger.LogKeys.DeployManagerService, "DeployAppProject", "Deploy script finished " + err? "with an error" : "correctly");
                     if(err){
+                        Logger.Log(Logger.LogKeys.DeployManagerService, "DeployAppProject", "Deploy script finished with an error", err);
                         reject("Error when trying to deploy the update");
                     }
                     else{
+                        Logger.Log(Logger.LogKeys.DeployManagerService, "DeployAppProject", "Deploy script finished correctly");
                         resolve();
                     }
                 });
