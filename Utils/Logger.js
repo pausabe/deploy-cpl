@@ -92,7 +92,7 @@ function log(logKey, message, param, limit){
     function exportLog(message){
         const today = new Date();
         const fileName = today.getDate() + "_" + (today.getMonth() + 1) + "_" + today.getFullYear();
-        const exportLogPath = DatabaseKeys.DatabaseBackupDirectory + fileName + ".txt";
+        const exportLogPath = DatabaseKeys.LogDirectory + fileName + ".txt";
         fs.writeFile(exportLogPath, message, (err) => {
             if (err) {
                 console.log("error trying to export the log", err);
