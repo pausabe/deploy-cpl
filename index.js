@@ -95,33 +95,23 @@ app.listen(port, () => {
 })
 
 async function PublishDatabaseChangesProduction(databaseFile) {
-    await PublishDatabaseChanges(
-        databaseFile,
-        true,
-        app_repo_branch_production,
-        DatabaseKeys.RepositoryDirectoryName,
-        expo_prod_channel);
+    await DeployManagerService.MoveDatabaseInsideProject(DatabaseKeys.RepositoryDirectoryName, databaseFile);
+    await DeployManagerService.BackUpDatabase(DatabaseKeys.RepositoryDirectoryName);
+    await DeployManagerService.UpdateAppRepository(DatabaseKeys.RepositoryDirectoryName, app_repo_branch_production);
+    let currentAppBuildNumber = GetCurrentAppBuildNumber(DatabaseKeys.RepositoryDirectoryName);
+    let expoReleaseChannel = expo_prod_channel + "_" + currentAppBuildNumber;
+    await DeployManagerService.DeployAppProject(expoReleaseChannel, DatabaseKeys.RepositoryDirectoryName, expo_user, expo_pass, expo_send);
 }
 
 async function PublishDatabaseChangesTest(databaseFile, repoBranch, expoTestChannel) {
-    await PublishDatabaseChanges(
-        databaseFile,
-        false,
-        repoBranch,
-        DatabaseKeys.RepositoryDirectoryNameTest,
-        expoTestChannel);
+    await DeployManagerService.MoveDatabaseInsideProject(DatabaseKeys.RepositoryDirectoryNameTest, databaseFile);
+    await DeployManagerService.UpdateAppRepository(DatabaseKeys.RepositoryDirectoryNameTest, repoBranch);
+    await DeployManagerService.DeployAppProject(expoTestChannel, DatabaseKeys.RepositoryDirectoryNameTest, expo_user, expo_pass, expo_send);
 }
 
-async function PublishDatabaseChanges(
-    databaseFile,
-    backCurrentDatabase,
-    appRepoBranch,
-    repositoryDirectoryName,
-    expoReleaseChannel) {
-    await DeployManagerService.MoveDatabaseInsideProject(repositoryDirectoryName, databaseFile);
-    if (backCurrentDatabase) {
-        await DeployManagerService.BackUpDatabase(repositoryDirectoryName);
-    }
-    await DeployManagerService.UpdateAppRepository(repositoryDirectoryName, appRepoBranch);
-    await DeployManagerService.DeployAppProject(expoReleaseChannel, repositoryDirectoryName, expo_user, expo_pass, expo_send);
+function GetCurrentAppBuildNumber(repositoryDirectoryName){
+    let appConfigFilePath = `./${repositoryDirectoryName}/app.json`;
+    let appConfigFileContentString = fs.readFileSync(appConfigFilePath);
+    let appConfigFileContentJson = JSON.parse(appConfigFileContentString.toString());
+    return appConfigFileContentJson.expo.ios.buildNumber;
 }

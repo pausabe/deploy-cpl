@@ -1,6 +1,5 @@
 const DatabaseKeys = require("./DatabaseKeys");
 const shell = require('child_process');
-const fs = require("fs");
 const FileSystemService = require("./FileSystemService");
 const Logger = require("../Utils/Logger");
 
@@ -22,6 +21,8 @@ async function BackUpDatabase(repositoryDirectoryName){
 
 async function UpdateAppRepository(repositoryDirectoryName, appRepoBranch){
     Logger.Log(Logger.LogKeys.DeployManagerService, "UpdateAppRepository", "Updating Repository from branch:", appRepoBranch);
+    // TODO: this should only be executed if we are actually going to change the branch or there are new commits ahead
+    //  We would avoid unnecessary node_modules deletion and 'npm install' runs
     return new Promise((resolve, reject) => {
         shell.exec(
         `sh UpdateAppRepository.sh ${repositoryDirectoryName} ${appRepoBranch}`,
@@ -38,12 +39,10 @@ async function UpdateAppRepository(repositoryDirectoryName, appRepoBranch){
 
 async function DeployAppProject(expoReleaseChannel, repositoryDirectoryName, expo_user, expo_pass, expo_send){
     return new Promise((resolve, reject) => {
-        let currentAppBuildNumber = GetCurrentAppBuildNumber(repositoryDirectoryName);
-        let channelName = expoReleaseChannel + "_" + currentAppBuildNumber;
-        Logger.Log(Logger.LogKeys.DeployManagerService, "DeployAppProject", "Deploying App in channel:", channelName);
+        Logger.Log(Logger.LogKeys.DeployManagerService, "DeployAppProject", "Deploying App in channel:", expoReleaseChannel);
         if(DatabaseKeys.DeployActivated === 'true'){
             shell.exec(
-                `sh deploy-cpl.sh ${repositoryDirectoryName} ${expo_user} ${expo_pass} ${expo_send} ${channelName}`,
+                `sh deploy-cpl.sh ${repositoryDirectoryName} ${expo_user} ${expo_pass} ${expo_send} ${expoReleaseChannel}`,
                 async (err, stdout, stderr) => {
                     if(err){
                         Logger.Log(Logger.LogKeys.DeployManagerService, "DeployAppProject", "Deploy script finished with an error", err);
@@ -59,15 +58,6 @@ async function DeployAppProject(expoReleaseChannel, repositoryDirectoryName, exp
             resolve();
         }
     });
-}
-
-function GetCurrentAppBuildNumber(repositoryDirectoryName){
-    let appConfigFilePath = `./${repositoryDirectoryName}/app.json`;
-    let appConfigFileContentString = fs.readFileSync(appConfigFilePath);
-    let appConfigFileContentJson = JSON.parse(appConfigFileContentString.toString());
-    let appVersionRaw = appConfigFileContentJson.expo.version;
-    let appVersionRawArray = appVersionRaw.split(".");
-    return appVersionRawArray[1];
 }
 
 module.exports = { BackUpDatabase, MoveDatabaseInsideProject, UpdateAppRepository, DeployAppProject }
