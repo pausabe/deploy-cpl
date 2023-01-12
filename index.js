@@ -90,6 +90,18 @@ app.post('/PublishTest', async (req, res) => {
     }
 });
 
+app.post('/UpdateProductionRepository', async (req, res) => {
+    try {
+        Logger.Log(Logger.LogKeys.IndexJS, "UpdateProductionRepository", "Update Production Repository");
+        await DeployManagerService.UpdateAppRepository(DatabaseKeys.RepositoryDirectoryName, app_repo_branch_production);
+        Logger.Log(Logger.LogKeys.IndexJS, "UpdateProductionRepository", "Production repository updated correctly");
+        res.send('Production repository updated correctly');
+    } catch (err) {
+        Logger.LogError(Logger.LogKeys.IndexJS, "UpdateProductionRepository", err);
+        res.status(500).send(err);
+    }
+});
+
 app.listen(port, () => {
     Logger.Log(Logger.LogKeys.IndexJS, "listen", "CPL web at port:", port);
 })

@@ -87,7 +87,12 @@
                 <label>> Database: </label>
                 <input name="db_file" type="file" accept=".db" /><br><br>
                 <button type="submit"
-                        onclick="return confirm('Are you sure?');">Publish</button>
+                        onclick="return confirm('Are you sure you want to publish?');">Publish</button>
+            </form>
+            <form action="/UpdateProductionRepository" method="POST" enctype="multipart/form-data">
+                <p>--------------------------</p>
+                <button type="submit"
+                        onclick="return confirm('Are you sure you want to update production repository?');">Update Production Repository</button>
             </form>
         </div>
 
