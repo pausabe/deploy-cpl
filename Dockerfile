@@ -3,11 +3,10 @@ WORKDIR /opt/deploy-cpl
 RUN apt-get update && apt-get install -y git
 RUN apt install --quiet nano
 RUN npm init -y
-RUN npm install -g expo-cli@6.1.0
 RUN npx expo install expo-splash-screen
 RUN npx expo install expo-system-ui
 RUN npx expo install expo-updates
-RUN npm install --quiet -g eas-cli@3.1.1
+RUN npm install --quiet -g eas-cli@13.2.3
 RUN npm install --quiet --save express
 RUN npm install --quiet --save express-basic-auth
 RUN npm install --quiet --save express-fileupload
