@@ -1,4 +1,4 @@
-FROM node:14.15-stretch
+FROM node:18-stretch
 WORKDIR /opt/deploy-cpl
 RUN apt-get update && apt-get install -y git
 RUN apt install --quiet nano
