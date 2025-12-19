@@ -29,6 +29,7 @@ const loginLimiter = rateLimit({
     message: 'Demasiados intentos de login. Por favor, espera 15 minutos antes de volver a intentarlo.',
     standardHeaders: true,
     legacyHeaders: false,
+    skipSuccessfulRequests: true, // Solo contar intentos fallidos de autenticación
     // Bloquear basado en IP
     keyGenerator: (req) => {
         return req.ip;
