@@ -1,99 +1,304 @@
-<!DOCTYPE>
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
         <style>
-            body {font-family: Arial;}
-
-            /* Style the tab */
-            .tab {
-                overflow: hidden;
-                border: 1px solid #ccc;
-                background-color: #f1f1f1;
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
 
-            /* Style the buttons inside the tab */
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 900px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                overflow: hidden;
+            }
+
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 30px;
+                text-align: center;
+            }
+
+            .header h2 {
+                font-size: 28px;
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+
+            .header p {
+                font-size: 16px;
+                opacity: 0.95;
+            }
+
+            .tab {
+                display: flex;
+                background-color: #f8f9fa;
+                border-bottom: 2px solid #e9ecef;
+            }
+
             .tab button {
-                background-color: inherit;
-                float: left;
+                flex: 1;
+                background-color: transparent;
                 border: none;
                 outline: none;
                 cursor: pointer;
-                padding: 14px 16px;
-                transition: 0.3s;
-                font-size: 17px;
+                padding: 18px 20px;
+                transition: all 0.3s ease;
+                font-size: 16px;
+                font-weight: 500;
+                color: #6c757d;
+                position: relative;
             }
 
             .tab button:hover {
-                background-color: #ddd;
+                background-color: #e9ecef;
+                color: #495057;
             }
 
             .tab button.active {
-                background-color: #ccc;
+                color: #667eea;
+                background-color: white;
+            }
+
+            .tab button.active::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
             }
 
             .tabcontent {
                 display: none;
-                padding: 6px 12px;
-                border: 1px solid #ccc;
-                border-top: none;
+                padding: 35px;
+                animation: fadeIn 0.3s ease;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            .instructions {
+                background: #f8f9fa;
+                border-left: 4px solid #667eea;
+                padding: 20px;
+                margin-bottom: 30px;
+                border-radius: 8px;
+            }
+
+            .instructions h3 {
+                color: #667eea;
+                margin-bottom: 15px;
+                font-size: 18px;
+            }
+
+            .instructions ol {
+                margin-left: 20px;
+                line-height: 1.8;
+                color: #495057;
+            }
+
+            .instructions ol li {
+                margin-bottom: 8px;
+            }
+
+            .info-box {
+                background: #fff3cd;
+                border-left: 4px solid #ffc107;
+                padding: 15px;
+                margin-top: 20px;
+                border-radius: 8px;
+                font-size: 14px;
+                line-height: 1.6;
+                color: #856404;
+            }
+
+            form {
+                background: #f8f9fa;
+                padding: 25px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+            }
+
+            form p {
+                color: #495057;
+                margin-bottom: 15px;
+                line-height: 1.6;
+            }
+
+            label {
+                display: block;
+                color: #495057;
+                font-weight: 500;
+                margin-bottom: 8px;
+                font-size: 15px;
+            }
+
+            input[type="text"],
+            input[type="file"] {
+                width: 100%;
+                padding: 12px 15px;
+                border: 2px solid #dee2e6;
+                border-radius: 8px;
+                font-size: 15px;
+                transition: border-color 0.3s ease;
+                background: white;
+                margin-bottom: 15px;
+            }
+
+            input[type="text"]:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+
+            input[type="file"] {
+                padding: 10px;
+                cursor: pointer;
+            }
+
+            button[type="submit"] {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                padding: 14px 30px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                margin-top: 10px;
+            }
+
+            button[type="submit"]:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            }
+
+            button[type="submit"]:active {
+                transform: translateY(0);
+            }
+
+            .form-row {
+                margin-bottom: 20px;
+            }
+
+            .divider {
+                border: 0;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, #dee2e6, transparent);
+                margin: 30px 0;
+            }
+
+            .danger-button {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+            }
+
+            .danger-button:hover {
+                box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
             }
         </style>
     </head>
     <body>
+        <div class="container">
+            <div class="header">
+                <h2>🚀 CPL Distribució App</h2>
+                <p>Selecciona el teu perfil per gestionar la base de dades</p>
+            </div>
 
-        <h2>CPL Distribució App</h2>
-        <p>Selecciona el teu perfil (CPL Editorial o Admin):</p>
+            <div class="tab">
+                <button class="tablinks" onclick="openTab(event, 'CPL')">📚 CPL Editorial</button>
+                <button class="tablinks" onclick="openTab(event, 'Admin')">⚙️ Admin</button>
+            </div>
 
-        <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'CPL')">CPL Editorial</button>
-            <button class="tablinks" onclick="openTab(event, 'Admin')">Admin</button>
-        </div>
+            <div id="CPL" class="tabcontent">
+                <div class="instructions">
+                    <h3>📋 Instruccions</h3>
+                    <ol>
+                        <li>Descarregar la base de dades (botó 'Baixar')</li>
+                        <li>Fer les modificacions necessàries a l'ordinador</li>
+                        <li>Publicar la nova base de dades (seleccionant-la i clicant 'Publicar')</li>
+                        <li>Esperar fins que la pàgina s'ha carregat del tot i surt un missatge de confirmació (a vegades pot tardar molt, 10 minuts o més)</li>
+                        <li>Finalment, obrir l'aplicació i veure que surt un missatge dient que hi ha una actualització. Cal esperar que reinici l'aplicació automàticament i ja estarà actualitzada amb base de dades modificada</li>
+                    </ol>
+                </div>
 
-        <div id="CPL" class="tabcontent">
-            <br>
-            <label>Instruccions:</label><br><br>
-            <label>1. Descarregar la base de dades (botó 'Baixar')</label><br>
-            <label>2. Fer les modificacions necessàries a l'ordinador</label><br>
-            <label>3. Publicar la nova base de dades (seleccionant-la i clicant 'Publicar')</label><br>
-            <label>4. Esperar fins que la pàgina s'ha carregat del tot i surt un missatge de confirmació (a vegades pot tardar molt, 10 minuts o més)</label><br>
-            <label>5. Finalment, obrir l'aplicació i veure que surt un missatge dient que hi ha una actualització. Cal esperar que reinici l'aplicació automàticament i ja estarà actualitzada amb base de dades modificada</label><br><br>
-            <label>En la base de dades hi ha la taula '_tables_log' que guarda un històric de tots els canvis.</label><br>
-            <label>En l'aplicació, dins la configuració i a sota de tot, es troba el número de versió de la base de dades que correspon al número de registres a '_tables_log'.</label><br>
-            <label>Això permet saber en tot moment la versió de la base de dades. És aconsellable comprobar-la en cada pas (quan es baixa en el pas 1, després de fer les modificacions en el pas 2 i quan revisem que l'actualització ha anat bé en el pas 5.</label><br><br>
-            <form action="/DownloadDatabaseFromProduction" method="GET">
-                <label>> Descarregar l'última base de dades en el servidor: </label>
-                <button type="submit">Baixar</button>
-            </form>
-            <form action="/PublishProduction" method="POST" enctype="multipart/form-data">
-                <label>> Seleccionar la base de dades modificada: </label>
-                <input name="db_file" type="file" accept=".db" />
-                <button type="submit"
-                        onclick="return confirm('Estàs segur?');">Publicar</button>
-            </form>
-        </div>
+                <div class="info-box">
+                    <strong>ℹ️ Informació important:</strong><br><br>
+                    En la base de dades hi ha la taula '_tables_log' que guarda un històric de tots els canvis.<br><br>
+                    En l'aplicació, dins la configuració i a sota de tot, es troba el número de versió de la base de dades que correspon al número de registres a '_tables_log'.<br><br>
+                    Això permet saber en tot moment la versió de la base de dades. És aconsellable comprobar-la en cada pas (quan es baixa en el pas 1, després de fer les modificacions en el pas 2 i quan revisem que l'actualització ha anat bé en el pas 5).
+                </div>
 
-        <div id="Admin" class="tabcontent">
-            <form action="/PublishTest" method="POST" enctype="multipart/form-data">
-                <p>Release the uploaded database to the desired channel using Expo OTA. Make sure it's a test channel!</p>
-                <label>It will:</label><br>
-                <label>1. Save the database in the database test project directory</label><br>
-                <label>2. Update repository with the introduced repo branch name</label><br>
-                <label>3. Deploy to the introduced channel</label><br><br>
-                <label>> Repository Branch: </label>
-                <input name="repobranch" type="text" /><br><br>
-                <label>> Release Channel Name: </label>
-                <input name="releasechannel" type="text" /><br><br>
-                <label>> Database: </label>
-                <input name="db_file" type="file" accept=".db" /><br><br>
-                <button type="submit"
-                        onclick="return confirm('Are you sure you want to publish?');">Publish</button>
-            </form>
-            <form action="/UpdateProductionRepository" method="POST" enctype="multipart/form-data">
-                <p>--------------------------</p>
-                <button type="submit"
-                        onclick="return confirm('Are you sure you want to update production repository?');">Update Production Repository</button>
-            </form>
+                <form action="/DownloadDatabaseFromProduction" method="GET">
+                    <label>📥 Descarregar l'última base de dades en el servidor</label>
+                    <button type="submit">Baixar</button>
+                </form>
+
+                <form action="/PublishProduction" method="POST" enctype="multipart/form-data">
+                    <label>📤 Seleccionar la base de dades modificada</label>
+                    <input name="db_file" type="file" accept=".db" />
+                    <button type="submit" onclick="return confirm('Estàs segur?');">Publicar</button>
+                </form>
+            </div>
+
+            <div id="Admin" class="tabcontent">
+                <form action="/PublishTest" method="POST" enctype="multipart/form-data">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🧪 Test Release</h3>
+                    <p>Release the uploaded database to the desired channel using Expo OTA. Make sure it's a test channel!</p>
+                    
+                    <div class="instructions" style="margin-top: 15px;">
+                        <h3>Process</h3>
+                        <ol>
+                            <li>Save the database in the database test project directory</li>
+                            <li>Update repository with the introduced repo branch name</li>
+                            <li>Deploy to the introduced channel</li>
+                        </ol>
+                    </div>
+
+                    <div class="form-row">
+                        <label>🌿 Repository Branch</label>
+                        <input name="repobranch" type="text" placeholder="e.g., feature/new-update" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>📢 Release Channel Name</label>
+                        <input name="releasechannel" type="text" placeholder="e.g., test-channel-1" />
+                    </div>
+
+                    <div class="form-row">
+                        <label>💾 Database</label>
+                        <input name="db_file" type="file" accept=".db" />
+                    </div>
+
+                    <button type="submit" onclick="return confirm('Are you sure you want to publish?');">Publish Test</button>
+                </form>
+
+                <hr class="divider">
+
+                <form action="/UpdateProductionRepository" method="POST" enctype="multipart/form-data">
+                    <h3 style="color: #f5576c; margin-bottom: 15px;">⚠️ Update Production Repository</h3>
+                    <p style="color: #dc3545;">This will update the production repository. Use with caution!</p>
+                    <button type="submit" class="danger-button" onclick="return confirm('Are you sure you want to update production repository?');">Update Production Repository</button>
+                </form>
+            </div>
         </div>
 
         <script>
