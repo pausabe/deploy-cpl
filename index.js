@@ -25,15 +25,11 @@ webCredentials[cpl_user] = cpl_pass;
 // Protección contra ataques de fuerza bruta
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 5, // Máximo 5 intentos por ventana
+    max: 100, // Máximo 100 intentos por ventana (protege contra fuerza bruta pero permite uso normal)
     message: 'Demasiados intentos de login. Por favor, espera 15 minutos antes de volver a intentarlo.',
     standardHeaders: true,
     legacyHeaders: false,
     skipSuccessfulRequests: true, // Solo contar intentos fallidos de autenticación
-    // Bloquear basado en IP
-    keyGenerator: (req) => {
-        return req.ip;
-    },
     // Handler para registrar intentos bloqueados
     handler: (req, res) => {
         Logger.LogError(Logger.LogKeys.IndexJS, "RateLimiter", `Demasiados intentos de login desde IP: ${req.ip}`);
