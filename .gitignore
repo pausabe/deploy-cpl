@@ -2,3 +2,4 @@ secrets.env
 .DS_Store
 db
 database
+node_modules

@@ -4,6 +4,7 @@ const Logger = require("./Utils/Logger")
 
 const fs = require("fs");
 const basicAuth = require('express-basic-auth');
+const rateLimit = require('express-rate-limit');
 const express = require('express');
 const app = express();
 const fileUpload = require('express-fileupload');
@@ -21,6 +22,25 @@ const app_repo_branch_production = process.env.APP_REPO_BRANCH_PRODUCTION;
 let webCredentials = {};
 webCredentials[cpl_user] = cpl_pass;
 
+// Protección contra ataques de fuerza bruta
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 5, // Máximo 5 intentos por ventana
+    message: 'Demasiados intentos de login. Por favor, espera 15 minutos antes de volver a intentarlo.',
+    standardHeaders: true,
+    legacyHeaders: false,
+    // Bloquear basado en IP
+    keyGenerator: (req) => {
+        return req.ip;
+    },
+    // Handler para registrar intentos bloqueados
+    handler: (req, res) => {
+        Logger.LogError(Logger.LogKeys.IndexJS, "RateLimiter", `Demasiados intentos de login desde IP: ${req.ip}`);
+        res.status(429).send('Demasiados intentos de login. Por favor, espera 15 minutos antes de volver a intentarlo.');
+    }
+});
+
+app.use(loginLimiter);
 app.use(basicAuth({
         challenge: true,
         users: webCredentials,
