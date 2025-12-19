@@ -11,6 +11,7 @@ RUN npm install --quiet -g eas-cli@13.2.3
 RUN npm install --quiet --save express
 RUN npm install --quiet --save express-basic-auth
 RUN npm install --quiet --save express-fileupload
+RUN npm install --quiet --save express-rate-limit
 RUN npm install sqlite3 --build-from-source
 RUN git clone https://github.com/pausabe/cpl-app cpl-app\
     && cd cpl-app\
