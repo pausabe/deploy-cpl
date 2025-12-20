@@ -84,6 +84,33 @@ app.get('/DownloadDatabaseFromProduction', async function (req, res) {
     }
 });
 
+app.get('/DownloadBackup', function (req, res) {
+    try {
+        const filename = req.query.filename;
+        if (!filename) {
+            return res.status(400).send('Missing filename parameter');
+        }
+        
+        // Security: prevent directory traversal
+        if (filename.includes('..') || filename.includes('/')) {
+            Logger.LogError(Logger.LogKeys.IndexJS, "DownloadBackup", "Invalid filename: " + filename);
+            return res.status(400).send('Invalid filename');
+        }
+        
+        const backupPath = `${DatabaseKeys.DatabaseBackupDirectory}${filename}`;
+        Logger.Log(Logger.LogKeys.IndexJS, "DownloadBackup", "Downloading backup: " + backupPath);
+        
+        if (!fs.existsSync(backupPath)) {
+            return res.status(404).send('Backup file not found');
+        }
+        
+        res.download(backupPath, filename);
+    } catch (err) {
+        Logger.LogError(Logger.LogKeys.IndexJS, "DownloadBackup", err);
+        res.status(500).send('Error downloading backup: ' + err);
+    }
+});
+
 app.post('/PublishProduction', async (req, res) => {
     try {
         Logger.Log(Logger.LogKeys.IndexJS, "PublishProduction", "Starting Release in production");
@@ -307,13 +334,13 @@ app.get('/SystemLogs', (req, res) => {
             // If no log file exists, provide helpful message
             res.json({ 
                 logs: [
-                    '⚠️ No s\'han trobat logs per avui.',
+                    '⚠️ No logs found for today.',
                     '',
-                    'Possibles raons:',
-                    '- El USB no està muntat (els logs es guarden a /opt/usb)',
-                    '- Encara no s\'ha generat cap log avui',
+                    'Possible reasons:',
+                    '- USB is not mounted (logs are saved to /opt/usb)',
+                    '- No logs have been generated yet today',
                     '',
-                    'Ruta esperada: ' + logPath
+                    'Expected path: ' + logPath
                 ],
                 file: null,
                 totalLines: 0
@@ -323,7 +350,7 @@ app.get('/SystemLogs', (req, res) => {
         Logger.LogError(Logger.LogKeys.IndexJS, "SystemLogs", err);
         res.status(500).json({ 
             error: err.message, 
-            logs: ['❌ Error llegint els logs: ' + err.message]
+            logs: ['❌ Error reading logs: ' + err.message]
         });
     }
 });

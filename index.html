@@ -653,9 +653,9 @@
                     
                     let html = '';
                     
-                    // Database Status - PRIMERA i MÉS IMPORTANT
+                    // Database Status
                     html += '<div style="background: #fff; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 15px;">';
-                    html += '<h4 style="color: #495057; margin: 0 0 15px 0; font-size: 16px;">🗄️ BASE DE DADES</h4>';
+                    html += '<h4 style="color: #495057; margin: 0 0 15px 0; font-size: 16px;">🗄️ DATABASE</h4>';
                     if (status.database.exists) {
                         if (status.database.version) {
                             const versionDate = new Date(status.database.version);
@@ -667,14 +667,14 @@
                                 minute: '2-digit'
                             });
                             html += `<div style="background: #e3f2fd; padding: 12px; border-radius: 6px; margin-bottom: 10px;">`;
-                            html += `<p style="margin: 0; color: #1976D2; font-size: 15px; font-weight: bold;">📅 Versió: ${versionStr}</p>`;
+                            html += `<p style="margin: 0; color: #1976D2; font-size: 15px; font-weight: bold;">📅 Version: ${versionStr}</p>`;
                             html += '</div>';
                         }
                         const dbSizeKB = (status.database.size / 1024).toFixed(1);
-                        html += `<p style="margin: 5px 0; font-size: 14px; color: #28a745;">✅ Mida: ${dbSizeKB} KB</p>`;
+                        html += `<p style="margin: 5px 0; font-size: 14px; color: #28a745;">✅ Size: ${dbSizeKB} KB</p>`;
                     } else {
-                        html += '<p style="margin: 0; color: #dc3545; font-weight: bold; font-size: 15px;">❌ NO TROBADA</p>';
-                        html += '<p style="margin: 10px 0 0 0; font-size: 13px; color: #856404;">Puja una BD des de "Pujar BD Inicial"</p>';
+                        html += '<p style="margin: 0; color: #dc3545; font-weight: bold; font-size: 15px;">❌ NOT FOUND</p>';
+                        html += '<p style="margin: 10px 0 0 0; font-size: 13px; color: #856404;">Upload a DB from "Upload Database"</p>';
                     }
                     html += '</div>';
                     
@@ -682,25 +682,36 @@
                     html += '<div style="background: #fff; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 15px;">';
                     html += '<h4 style="color: #495057; margin: 0 0 15px 0; font-size: 16px;">💾 BACKUPS (USB)</h4>';
                     if (status.usb.mounted && status.usb.writable) {
-                        html += '<p style="margin: 0 0 10px 0; font-size: 14px; color: #28a745;">✅ USB OK - Backups funcionant</p>';
+                        html += '<p style="margin: 0 0 10px 0; font-size: 14px; color: #28a745;">✅ USB OK - Backups working</p>';
                         if (status.usb.backups.length > 0) {
-                            html += `<p style="margin: 0; font-size: 13px; color: #6c757d;">${status.usb.backups.length} backups guardats</p>`;
+                            html += `<p style="margin: 0 0 10px 0; font-size: 13px; color: #6c757d;">${status.usb.backups.length} backups saved</p>`;
+                            html += '<div style="max-height: 300px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 6px;">';
+                            html += '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+                            html += '<thead><tr style="background: #f8f9fa;"><th style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;">File</th><th style="padding: 8px; text-align: right; border-bottom: 2px solid #dee2e6;">Size</th><th style="padding: 8px; text-align: center; border-bottom: 2px solid #dee2e6;">Modified</th><th style="padding: 8px; text-align: center; border-bottom: 2px solid #dee2e6;">Download</th></tr></thead>';
+                            html += '<tbody>';
+                            status.usb.backups.forEach((backup, idx) => {
+                                const bgColor = idx % 2 === 0 ? '#fff' : '#f8f9fa';
+                                const sizeKB = (backup.size / 1024).toFixed(1);
+                                const modDate = new Date(backup.modified).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                                html += `<tr style="background: ${bgColor};"><td style="padding: 8px; border-bottom: 1px solid #e9ecef;">${backup.name}</td><td style="padding: 8px; text-align: right; border-bottom: 1px solid #e9ecef;">${sizeKB} KB</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e9ecef;">${modDate}</td><td style="padding: 8px; text-align: center; border-bottom: 1px solid #e9ecef;"><a href="/DownloadBackup?filename=${encodeURIComponent(backup.name)}" style="color: #667eea; text-decoration: none; font-weight: bold;">⬇️</a></td></tr>`;
+                            });
+                            html += '</tbody></table></div>';
                         }
                     } else if (status.usb.mounted && !status.usb.writable) {
-                        html += '<p style="margin: 0; color: #ff9800; font-weight: bold;">⚠️ USB muntat però sense permisos</p>';
+                        html += '<p style="margin: 0; color: #ff9800; font-weight: bold;">⚠️ USB mounted but no write permissions</p>';
                     } else {
-                        html += '<p style="margin: 0; color: #dc3545; font-weight: bold;">❌ USB NO muntat</p>';
-                        html += '<p style="margin: 10px 0 0 0; font-size: 13px; color: #856404;">Els backups NO es guardaran!</p>';
+                        html += '<p style="margin: 0; color: #dc3545; font-weight: bold;">❌ USB NOT mounted</p>';
+                        html += '<p style="margin: 10px 0 0 0; font-size: 13px; color: #856404;">Backups will NOT be saved!</p>';
                     }
                     html += '</div>';
                     
                     // Repository Status
                     html += '<div style="background: #fff; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px;">';
-                    html += '<h4 style="color: #495057; margin: 0 0 15px 0; font-size: 16px;">📁 REPOSITORI</h4>';
+                    html += '<h4 style="color: #495057; margin: 0 0 15px 0; font-size: 16px;">📁 REPOSITORY</h4>';
                     if (status.repository.exists) {
-                        html += '<p style="margin: 0; font-size: 14px; color: #28a745;">✅ Repositori disponible</p>';
+                        html += '<p style="margin: 0; font-size: 14px; color: #28a745;">✅ Repository available</p>';
                     } else {
-                        html += '<p style="margin: 0; color: #dc3545; font-weight: bold;">❌ NO trobat</p>';
+                        html += '<p style="margin: 0; color: #dc3545; font-weight: bold;">❌ NOT found</p>';
                     }
                     html += '</div>';
                     
