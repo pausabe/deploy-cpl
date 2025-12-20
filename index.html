@@ -214,6 +214,116 @@
             .danger-button:hover {
                 box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
             }
+
+            /* Modal styles */
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0,0,0,0.5);
+                animation: fadeIn 0.3s ease;
+            }
+
+            .modal-content {
+                background-color: #fefefe;
+                margin: 10% auto;
+                padding: 0;
+                border-radius: 12px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                width: 90%;
+                max-width: 600px;
+                animation: slideDown 0.3s ease;
+            }
+
+            @keyframes slideDown {
+                from { transform: translateY(-50px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+
+            .modal-header {
+                padding: 20px 30px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border-radius: 12px 12px 0 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .modal-header h3 {
+                margin: 0;
+                font-size: 20px;
+            }
+
+            .modal-close {
+                color: white;
+                font-size: 32px;
+                font-weight: bold;
+                cursor: pointer;
+                line-height: 20px;
+                transition: transform 0.2s ease;
+            }
+
+            .modal-close:hover {
+                transform: scale(1.2);
+            }
+
+            .modal-body {
+                padding: 30px;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            .modal-body pre {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 8px;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            .modal-footer {
+                padding: 15px 30px;
+                background: #f8f9fa;
+                border-radius: 0 0 12px 12px;
+                text-align: right;
+            }
+
+            .modal-footer button {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                padding: 10px 25px;
+                border-radius: 6px;
+                font-size: 15px;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+            }
+
+            .modal-footer button:hover {
+                transform: translateY(-2px);
+            }
+
+            .loading-spinner {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                border: 3px solid rgba(255,255,255,.3);
+                border-radius: 50%;
+                border-top-color: white;
+                animation: spin 1s ease-in-out infinite;
+            }
+
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
         </style>
     </head>
     <body>
@@ -236,7 +346,7 @@
                         <li>Fer les modificacions necessàries a l'ordinador</li>
                         <li>Publicar la nova base de dades (seleccionant-la i clicant 'Publicar')</li>
                         <li>Esperar fins que la pàgina s'ha carregat del tot i surt un missatge de confirmació (a vegades pot tardar molt, 10 minuts o més)</li>
-                        <li>Finalment, obrir l'aplicació i veure que surt un missatge dient que hi ha una actualització. Cal esperar que reinici l'aplicació automàticament i ja estarà actualitzada amb base de dades modificada</li>
+                        <li>Finalment, obre l'app i vés a la pantalla de Configuració. A sota de tot trobaràs la versió (data) de la BD actual. Comprova que coincideix amb la que has pujat</li>
                     </ol>
                 </div>
 
@@ -247,6 +357,10 @@
                     Això permet saber en tot moment la versió de la base de dades. És aconsellable comprobar-la en cada pas (quan es baixa en el pas 1, després de fer les modificacions en el pas 2 i quan revisem que l'actualització ha anat bé en el pas 5).
                 </div>
 
+                <div id="cplDatabaseVersion" style="background: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+                    <p style="text-align: center; color: #6c757d; margin: 0;">⏳ Carregant versió de la base de dades...</p>
+                </div>
+
                 <form action="/DownloadDatabaseFromProduction" method="GET">
                     <label>📥 Descarregar l'última base de dades en el servidor</label>
                     <button type="submit">Baixar</button>
@@ -255,11 +369,51 @@
                 <form action="/PublishProduction" method="POST" enctype="multipart/form-data">
                     <label>📤 Seleccionar la base de dades modificada</label>
                     <input name="db_file" type="file" accept=".db" />
-                    <button type="submit" onclick="return confirm('Estàs segur?');">Publicar</button>
+                    <button type="submit">Publicar</button>
                 </form>
             </div>
 
             <div id="Admin" class="tabcontent">
+                <div class="instructions">
+                    <h3>📊 System Status</h3>
+                    <div id="systemStatus" style="margin-top: 15px;">
+                        <p style="text-align: center; color: #6c757d;">Loading...</p>
+                    </div>
+                    <button type="button" onclick="loadSystemStatus()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-top: 10px;">🔄 Refresh Status</button>
+                </div>
+
+                <hr class="divider">
+
+                <div class="instructions">
+                    <h3>📋 System Logs</h3>
+                    <div id="systemLogs" style="margin-top: 15px;">
+                        <p style="text-align: center; color: #6c757d;">Loading...</p>
+                    </div>
+                    <button type="button" onclick="loadSystemLogs()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-top: 10px;">🔄 Refresh Logs</button>
+                </div>
+
+                <hr class="divider">
+
+                <form action="/UploadInitialDatabase" method="POST" enctype="multipart/form-data">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📤 Upload Database</h3>
+                    <p>Updates the internal system database, which will be downloaded with the "Download" button. Useful for first installations.</p>
+                    
+                    <div class="info-box" style="margin-top: 15px;">
+                        <strong>📝 Important Note:</strong><br><br>
+                        The database is NOT copied during <code>docker build</code>. This is intentional to avoid using old databases.<br><br>
+                        After each rebuild, you MUST upload an initial database from here.
+                    </div>
+
+                    <div class="form-row">
+                        <label>💾 Database</label>
+                        <input name="db_file" type="file" accept=".db" required />
+                    </div>
+
+                    <button type="submit">Upload Database</button>
+                </form>
+
+                <hr class="divider">
+
                 <form action="/PublishTest" method="POST" enctype="multipart/form-data">
                     <h3 style="color: #667eea; margin-bottom: 15px;">🧪 Test Release</h3>
                     <p>Release the uploaded database to the desired channel using Expo OTA. Make sure it's a test channel!</p>
@@ -288,7 +442,7 @@
                         <input name="db_file" type="file" accept=".db" />
                     </div>
 
-                    <button type="submit" onclick="return confirm('Are you sure you want to publish?');">Publish Test</button>
+                    <button type="submit">Publish Test</button>
                 </form>
 
                 <hr class="divider">
@@ -296,12 +450,149 @@
                 <form action="/UpdateProductionRepository" method="POST" enctype="multipart/form-data">
                     <h3 style="color: #f5576c; margin-bottom: 15px;">⚠️ Update Production Repository</h3>
                     <p style="color: #dc3545;">This will update the production repository. Use with caution!</p>
-                    <button type="submit" class="danger-button" onclick="return confirm('Are you sure you want to update production repository?');">Update Production Repository</button>
+                    <button type="submit" class="danger-button">Update Production Repository</button>
                 </form>
             </div>
         </div>
 
+        <!-- Modal for feedback messages -->
+        <div id="feedbackModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Processing...</h3>
+                    <span class="modal-close" onclick="closeModal()">&times;</span>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <p style="text-align: center;">
+                        <span class="loading-spinner"></span>
+                        Processing request...
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
         <script>
+            // Modal functions
+            function showModal(title, content, isLoading = false) {
+                const modal = document.getElementById('feedbackModal');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalBody = document.getElementById('modalBody');
+                
+                modalTitle.textContent = title;
+                if (isLoading) {
+                    modalBody.innerHTML = '<p style="text-align: center;"><span class="loading-spinner"></span> ' + content + '</p>';
+                } else {
+                    modalBody.innerHTML = '<pre>' + content + '</pre>';
+                }
+                modal.style.display = 'block';
+            }
+
+            function closeModal() {
+                const modal = document.getElementById('feedbackModal');
+                modal.style.display = 'none';
+                
+                // Reload data after closing modal
+                const activeTab = document.querySelector('.tablinks.active');
+                if (activeTab) {
+                    const tabName = activeTab.textContent.includes('CPL Editorial') ? 'CPL' : 'Admin';
+                    if (tabName === 'Admin') {
+                        loadSystemStatus();
+                    } else if (tabName === 'CPL') {
+                        loadCPLDatabaseVersion();
+                    }
+                }
+            }
+
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                const modal = document.getElementById('feedbackModal');
+                if (event.target == modal) {
+                    closeModal();
+                }
+            }
+
+            // Generic form submission handler
+            async function handleFormSubmit(event, endpoint, successTitle, loadingMessage) {
+                event.preventDefault();
+                
+                const form = event.target;
+                const formData = new FormData(form);
+                
+                showModal(loadingMessage || 'Processing...', 'Please wait while the request is being processed...', true);
+                
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const text = await response.text();
+                    
+                    if (response.ok) {
+                        showModal(successTitle || '✅ Success', text);
+                        form.reset();
+                    } else {
+                        showModal('❌ Error', text);
+                    }
+                } catch (error) {
+                    showModal('❌ Connection Error', 'Could not connect to server:\n\n' + error.message);
+                }
+            }
+
+            // Specific handlers for each form
+            function setupFormHandlers() {
+                // CPL Editorial - Publish Production
+                const publishForm = document.querySelector('form[action="/PublishProduction"]');
+                if (publishForm) {
+                    publishForm.onsubmit = function(e) {
+                        if (confirm('Estàs segur?')) {
+                            handleFormSubmit(e, '/PublishProduction', '🎉 Publicació', 'Publicant... (pot trigar fins a 10 minuts)');
+                        } else {
+                            e.preventDefault();
+                        }
+                    };
+                }
+
+                // Admin - Upload Initial Database
+                const uploadInitialForm = document.querySelector('form[action="/UploadInitialDatabase"]');
+                if (uploadInitialForm) {
+                    uploadInitialForm.onsubmit = function(e) {
+                        if (confirm('Upload database?')) {
+                            handleFormSubmit(e, '/UploadInitialDatabase', '✅ Database Uploaded', 'Uploading database...');
+                        } else {
+                            e.preventDefault();
+                        }
+                    };
+                }
+
+                // Admin - Test Release
+                const testReleaseForm = document.querySelector('form[action="/PublishTest"]');
+                if (testReleaseForm) {
+                    testReleaseForm.onsubmit = function(e) {
+                        if (confirm('Are you sure you want to publish?')) {
+                            handleFormSubmit(e, '/PublishTest', '✅ Test Published', 'Publishing to test channel...');
+                        } else {
+                            e.preventDefault();
+                        }
+                    };
+                }
+
+                // Admin - Update Production Repository
+                const updateRepoForm = document.querySelector('form[action="/UpdateProductionRepository"]');
+                if (updateRepoForm) {
+                    updateRepoForm.onsubmit = function(e) {
+                        if (confirm('Are you sure you want to update production repository?')) {
+                            handleFormSubmit(e, '/UpdateProductionRepository', '✅ Repository Updated', 'Updating production repository...');
+                        } else {
+                            e.preventDefault();
+                        }
+                    };
+                }
+            }
+
             function openTab(evt, tabName) {
                 var i, tabcontent, tablinks;
                 tabcontent = document.getElementsByClassName("tabcontent");
@@ -314,7 +605,172 @@
                 }
                 document.getElementById(tabName).style.display = "block";
                 evt.currentTarget.className += " active";
+                
+                // Load system status when Admin tab is opened
+                if (tabName === 'Admin') {
+                    loadSystemStatus();
+                    loadSystemLogs();
+                }
+                // Load database version when CPL tab is opened
+                if (tabName === 'CPL') {
+                    loadCPLDatabaseVersion();
+                }
             }
+
+            async function loadCPLDatabaseVersion() {
+                const versionDiv = document.getElementById('cplDatabaseVersion');
+                try {
+                    const response = await fetch('/SystemStatus');
+                    const status = await response.json();
+                    
+                    if (status.database.exists && status.database.version) {
+                        const versionDate = new Date(status.database.version);
+                        const dateStr = versionDate.toLocaleDateString('ca-ES', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        versionDiv.innerHTML = `<p style="margin: 0; color: #1976D2; font-weight: 500;">📅 Versió actual de la base de dades: <strong>${dateStr}</strong></p>`;
+                    } else if (status.database.exists) {
+                        versionDiv.innerHTML = '<p style="margin: 0; color: #856404;">⚠️ No s\'ha pogut obtenir la versió de la base de dades</p>';
+                    } else {
+                        versionDiv.innerHTML = '<p style="margin: 0; color: #dc3545;">❌ Base de dades no trobada</p>';
+                    }
+                } catch (error) {
+                    versionDiv.innerHTML = '<p style="margin: 0; color: #dc3545;">❌ Error obtenint la versió</p>';
+                }
+            }
+
+            async function loadSystemStatus() {
+                const statusDiv = document.getElementById('systemStatus');
+                statusDiv.innerHTML = '<p style="text-align: center; color: #6c757d;">⏳ Carregant estat del sistema...</p>';
+                
+                try {
+                    const response = await fetch('/SystemStatus');
+                    const status = await response.json();
+                    
+                    let html = '';
+                    
+                    // Database Status - PRIMERA i MÉS IMPORTANT
+                    html += '<div style="background: #fff; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 15px;">';
+                    html += '<h4 style="color: #495057; margin: 0 0 15px 0; font-size: 16px;">🗄️ BASE DE DADES</h4>';
+                    if (status.database.exists) {
+                        if (status.database.version) {
+                            const versionDate = new Date(status.database.version);
+                            const versionStr = versionDate.toLocaleString('ca-ES', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            html += `<div style="background: #e3f2fd; padding: 12px; border-radius: 6px; margin-bottom: 10px;">`;
+                            html += `<p style="margin: 0; color: #1976D2; font-size: 15px; font-weight: bold;">📅 Versió: ${versionStr}</p>`;
+                            html += '</div>';
+                        }
+                        const dbSizeKB = (status.database.size / 1024).toFixed(1);
+                        html += `<p style="margin: 5px 0; font-size: 14px; color: #28a745;">✅ Mida: ${dbSizeKB} KB</p>`;
+                    } else {
+                        html += '<p style="margin: 0; color: #dc3545; font-weight: bold; font-size: 15px;">❌ NO TROBADA</p>';
+                        html += '<p style="margin: 10px 0 0 0; font-size: 13px; color: #856404;">Puja una BD des de "Pujar BD Inicial"</p>';
+                    }
+                    html += '</div>';
+                    
+                    // USB/Backups Status
+                    html += '<div style="background: #fff; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 15px;">';
+                    html += '<h4 style="color: #495057; margin: 0 0 15px 0; font-size: 16px;">💾 BACKUPS (USB)</h4>';
+                    if (status.usb.mounted && status.usb.writable) {
+                        html += '<p style="margin: 0 0 10px 0; font-size: 14px; color: #28a745;">✅ USB OK - Backups funcionant</p>';
+                        if (status.usb.backups.length > 0) {
+                            html += `<p style="margin: 0; font-size: 13px; color: #6c757d;">${status.usb.backups.length} backups guardats</p>`;
+                        }
+                    } else if (status.usb.mounted && !status.usb.writable) {
+                        html += '<p style="margin: 0; color: #ff9800; font-weight: bold;">⚠️ USB muntat però sense permisos</p>';
+                    } else {
+                        html += '<p style="margin: 0; color: #dc3545; font-weight: bold;">❌ USB NO muntat</p>';
+                        html += '<p style="margin: 10px 0 0 0; font-size: 13px; color: #856404;">Els backups NO es guardaran!</p>';
+                    }
+                    html += '</div>';
+                    
+                    // Repository Status
+                    html += '<div style="background: #fff; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px;">';
+                    html += '<h4 style="color: #495057; margin: 0 0 15px 0; font-size: 16px;">📁 REPOSITORI</h4>';
+                    if (status.repository.exists) {
+                        html += '<p style="margin: 0; font-size: 14px; color: #28a745;">✅ Repositori disponible</p>';
+                    } else {
+                        html += '<p style="margin: 0; color: #dc3545; font-weight: bold;">❌ NO trobat</p>';
+                    }
+                    html += '</div>';
+                    
+                    statusDiv.innerHTML = html;
+                } catch (error) {
+                    statusDiv.innerHTML = `<p style="color: #dc3545;">❌ Error: ${error.message}</p>`;
+                }
+            }
+
+            async function loadSystemLogs() {
+                const logsDiv = document.getElementById('systemLogs');
+                logsDiv.innerHTML = '<p style="text-align: center; color: #6c757d;">⏳ Carregant logs...</p>';
+                
+                try {
+                    const response = await fetch('/SystemLogs');
+                    const data = await response.json();
+                    
+                    if (data.logs && data.logs.length > 0) {
+                        let html = '';
+                        
+                        // Show file info
+                        if (data.file) {
+                            html += `<div style="background: #e3f2fd; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 13px;">`;
+                            html += `📄 Fitxer: <strong>${data.file}</strong> | `;
+                            html += `📊 Total línies: <strong>${data.totalLines}</strong> | `;
+                            html += `👁️ Mostrant: <strong>últimes ${data.logs.length}</strong>`;
+                            html += `</div>`;
+                        }
+                        
+                        // Show logs
+                        html += '<div style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 6px; max-height: 500px; overflow-y: auto; font-family: monospace; font-size: 11px; line-height: 1.5;">';
+                        data.logs.forEach(log => {
+                            // Color coding based on content
+                            let color = '#d4d4d4';
+                            if (log.includes('ERROR')) {
+                                color = '#ff6b6b';
+                            } else if (log.includes('WARNING') || log.includes('⚠️')) {
+                                color = '#ffd93d';
+                            } else if (log.includes('✅') || log.includes('SUCCESS')) {
+                                color = '#6bcf7f';
+                            }
+                            
+                            html += `<div style="color: ${color}; margin-bottom: 3px; word-break: break-all;">${escapeHtml(log)}</div>`;
+                        });
+                        html += '</div>';
+                        
+                        logsDiv.innerHTML = html;
+                    } else {
+                        logsDiv.innerHTML = '<p style="color: #856404;">⚠️ No hi ha logs disponibles</p>';
+                    }
+                } catch (error) {
+                    logsDiv.innerHTML = `<p style="color: #dc3545;">❌ Error carregant logs: ${error.message}</p>`;
+                }
+            }
+
+            function escapeHtml(text) {
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, m => map[m]);
+            }
+
+            // Initialize form handlers when page loads
+            document.addEventListener('DOMContentLoaded', function() {
+                setupFormHandlers();
+            });
         </script>
 
     </body>

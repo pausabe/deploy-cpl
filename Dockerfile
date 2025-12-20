@@ -41,8 +41,10 @@ COPY index.js .
 COPY Services/ ./Services
 COPY Utils/ ./Utils
 COPY index.html .
-COPY /db/cpl-app.db ./cpl-app/src/Assets/db/
-COPY /db/cpl-app.db ./cpl-app-test/src/Assets/db/
+
+# NOTE: Database is NOT copied during build
+# You MUST upload the initial database via Admin panel after first deployment
+# This prevents accidentally using an outdated database
 
 EXPOSE 3000
 

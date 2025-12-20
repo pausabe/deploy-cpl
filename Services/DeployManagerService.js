@@ -12,12 +12,18 @@ async function MoveDatabaseInsideProject(repositoryDirectoryName, databaseFile) 
 }
 
 async function BackUpDatabase(repositoryDirectoryName) {
-    let today = new Date();
-    let backupName = today.getMinutes().toString() + "_" + today.getDate().toString() + "_" + (today.getMonth() + 1).toString() + "_" + today.getFullYear().toString() + ".db";
-    let databaseFilePath = `./${repositoryDirectoryName}${DatabaseKeys.AppProjectDatabasePath}${DatabaseKeys.DatabaseName}`;
-    let backupFilePath = DatabaseKeys.DatabaseBackupDirectory + backupName;
-    Logger.Log(Logger.LogKeys.DeployManagerService, "BackUpDatabase", "Back up to:", backupFilePath);
-    await FileSystemService.CopyFile(databaseFilePath, backupFilePath);
+    try {
+        let today = new Date();
+        let backupName = today.getMinutes().toString() + "_" + today.getDate().toString() + "_" + (today.getMonth() + 1).toString() + "_" + today.getFullYear().toString() + ".db";
+        let databaseFilePath = `./${repositoryDirectoryName}${DatabaseKeys.AppProjectDatabasePath}${DatabaseKeys.DatabaseName}`;
+        let backupFilePath = DatabaseKeys.DatabaseBackupDirectory + backupName;
+        Logger.Log(Logger.LogKeys.DeployManagerService, "BackUpDatabase", "Back up to:", backupFilePath);
+        await FileSystemService.CopyFile(databaseFilePath, backupFilePath);
+        return { success: true, filename: backupName, path: backupFilePath };
+    } catch (error) {
+        Logger.LogError(Logger.LogKeys.DeployManagerService, "BackUpDatabase", "Failed to create backup:", error);
+        return { success: false, error: error.message || error.toString() };
+    }
 }
 
 async function UpdateAppRepository(repositoryDirectoryName, appRepoBranch) {
